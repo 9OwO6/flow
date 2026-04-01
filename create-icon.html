@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cute App Icon Generator</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            margin: 20px;
+        }
+        .controls {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="generateIcon('adaptive')">Generate Adaptive Icon</button>
+        <button onclick="generateIcon('regular')">Generate Regular Icon</button>
+        <button onclick="generateIcon('splash')">Generate Splash Icon</button>
+        <a id="downloadLink" style="display: none;">Download Icon</a>
+    </div>
+    <canvas id="iconCanvas" width="1024" height="1024"></canvas>
+
+    <script>
+        const canvas = document.getElementById('iconCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function drawCuteToiletPaper(type) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background
+            ctx.fillStyle = '#FFE55C';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (type === 'adaptive') {
+                // For adaptive icon, keep it simpler
+                drawToiletPaperRoll(canvas.width/2, canvas.height/2, 300, true);
+            } else if (type === 'regular') {
+                // For regular icon, add more details
+                drawToiletPaperRoll(canvas.width/2, canvas.height/2, 300, false);
+                drawStars();
+            } else if (type === 'splash') {
+                // For splash screen, make it larger
+                drawToiletPaperRoll(canvas.width/2, canvas.height/2, 400, false);
+                drawStars();
+                drawText();
+            }
+        }
+        
+        function drawToiletPaperRoll(x, y, size, isAdaptive) {
+            // Main roll
+            ctx.beginPath();
+            ctx.fillStyle = '#FFFFFF';
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner circle
+            ctx.beginPath();
+            ctx.fillStyle = '#FFE55C';
+            ctx.arc(x, y, size * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw cute face
+            if (!isAdaptive) {
+                // Eyes
+                const eyeSize = size * 0.15;
+                ctx.beginPath();
+                ctx.fillStyle = '#000000';
+                ctx.arc(x - size * 0.2, y - size * 0.1, eyeSize, 0, Math.PI * 2);
+                ctx.arc(x + size * 0.2, y - size * 0.1, eyeSize, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Rosy cheeks
+                ctx.beginPath();
+                ctx.fillStyle = '#FFB6C1';
+                ctx.arc(x - size * 0.3, y + size * 0.1, eyeSize * 1.2, 0, Math.PI * 2);
+                ctx.arc(x + size * 0.3, y + size * 0.1, eyeSize * 1.2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Smile
+                ctx.beginPath();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = size * 0.05;
+                ctx.arc(x, y + size * 0.1, size * 0.3, 0.1 * Math.PI, 0.9 * Math.PI);
+                ctx.stroke();
+            }
+            
+            // Decorative lines
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const innerRadius = size * 0.6;
+                const outerRadius = size * 0.9;
+                
+                ctx.beginPath();
+                ctx.strokeStyle = '#FFE55C';
+                ctx.lineWidth = size * 0.03;
+                ctx.moveTo(
+                    x + Math.cos(angle) * innerRadius,
+                    y + Math.sin(angle) * innerRadius
+                );
+                ctx.lineTo(
+                    x + Math.cos(angle) * outerRadius,
+                    y + Math.sin(angle) * outerRadius
+                );
+                ctx.stroke();
+            }
+        }
+        
+        function drawStars() {
+            ctx.fillStyle = '#FFD700';
+            for (let i = 0; i < 20; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 20 + 10;
+                
+                ctx.beginPath();
+                for (let j = 0; j < 5; j++) {
+                    const angle = (j / 5) * Math.PI * 2;
+                    const x1 = x + Math.cos(angle) * size;
+                    const y1 = y + Math.sin(angle) * size;
+                    if (j === 0) {
+                        ctx.moveTo(x1, y1);
+                    } else {
+                        ctx.lineTo(x1, y1);
+                    }
+                }
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+        
+        function drawText() {
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 80px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('La Le Mo', canvas.width/2, canvas.height - 100);
+        }
+        
+        function generateIcon(type) {
+            drawCuteToiletPaper(type);
+            
+            // Setup download
+            const link = document.getElementById('downloadLink');
+            link.style.display = 'inline';
+            link.href = canvas.toDataURL();
+            link.download = `${type}-icon.png`;
+            link.click();
+        }
+    </script>
+</body>
+</html>

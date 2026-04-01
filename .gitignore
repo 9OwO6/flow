@@ -35,3 +35,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# local / generated (do not commit)
+*.apk
+dist-web-test/
+android_backup/

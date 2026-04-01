@@ -1,0 +1,28 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="1024" height="1024" fill="#F8F7F2" rx="200"/>
+  
+  <!-- 流动曲线 - 主曲线 -->
+  <path d="M 200 512 Q 350 200, 512 512 T 824 512" 
+        stroke="#8FB9A8" 
+        stroke-width="80" 
+        fill="none" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  
+  <!-- 流动曲线 - 辅助曲线 -->
+  <path d="M 200 600 Q 350 300, 512 600 T 824 600" 
+        stroke="#8FB9A8" 
+        stroke-width="60" 
+        fill="none" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        opacity="0.6"/>
+  
+  <!-- 中心点 - 代表记录点 -->
+  <circle cx="512" cy="512" r="40" fill="#8FB9A8"/>
+  
+  <!-- 小装饰点 -->
+  <circle cx="300" cy="400" r="20" fill="#8FB9A8" opacity="0.5"/>
+  <circle cx="724" cy="624" r="20" fill="#8FB9A8" opacity="0.5"/>
+</svg>
