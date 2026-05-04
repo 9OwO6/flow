@@ -33,11 +33,11 @@ The goal of this project was to build a complete mobile product experience rathe
 
 ### Android APK
 
-The Android APK can be provided through the **Releases** section of this repository.
+The Android APK is available through the **Releases** section of this repository.
 
-[Download APK from Releases](https://github.com/9OwO6/flwo/releases)
+[Download APK from Releases](https://github.com/9OwO6/flow/releases)
 
-> If the APK is not available yet, please check back after the first release is published.
+> Android may require allowing installation from unknown sources before installing the APK manually.
 
 ---
 
@@ -180,6 +180,14 @@ The Android APK can be provided through the **Releases** section of this reposit
 - **Platform:** Android APK build
 
 > Tech stack may be updated as the project evolves.
+
+---
+
+## Documentation
+
+- [Build Notes](./docs/build.md) — Android APK build and release workflow
+- [Design Notes](./docs/design.md) — product positioning, brand direction, and UI principles
+- [Troubleshooting Notes](./docs/troubleshooting.md) — Expo Go and EAS build troubleshooting
 
 ---
 
