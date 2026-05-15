@@ -234,9 +234,9 @@ Native permission changes, such as microphone access for custom success sounds, 
 
 ## Documentation
 
-- **Build Notes**: Android APK build and release workflow.
-- **Design Notes**: product positioning, brand direction, and UI principles.
-- **Troubleshooting Notes**: Expo Go and EAS build troubleshooting.
+- [Build Notes](./docs/build.md): Android APK build and release workflow.
+- [Design Notes](./docs/design.md): product positioning, brand direction, and UI principles.
+- [Troubleshooting Notes](./docs/troubleshooting.md): Expo Go and EAS build troubleshooting.
 
 These notes can live in dedicated documentation files as the project grows. The README keeps the public portfolio narrative concise.
 
