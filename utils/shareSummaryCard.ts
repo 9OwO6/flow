@@ -27,7 +27,7 @@ export async function captureAndShareSummaryCard(
     }
     await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: 'Flow' });
   } catch (e) {
-    console.warn('shareSummaryCard', e);
+    if (__DEV__) console.warn('shareSummaryCard', e);
     Alert.alert('Share', 'Could not create or share the image.');
   }
 }

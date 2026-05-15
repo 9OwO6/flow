@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, View, ScrollView, Alert, TouchableOpacity, Animated, Modal, Platform, Pressable } from 'react-native';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import { Card, Button, Chip, Surface } from 'react-native-paper';
 import { StorageService } from '@/utils/storage';
 import { PoopRecord, SmoothLevel } from '@/types';
@@ -36,7 +36,6 @@ import {
   getMinutesUntilNewRecordAllowed,
 } from '@/utils/recordMinInterval';
 import HomeEmptyGuide from '@/components/home/HomeEmptyGuide';
-import Share7DayModal from '@/components/share/Share7DayModal';
 import { useCelebration, type RecordSaveCelebrationMeta } from '@/contexts/CelebrationContext';
 import QuickRecordSmoothModal from '@/components/home/QuickRecordSmoothModal';
 import WaterQuickLogModal from '@/components/water/WaterQuickLogModal';
@@ -66,7 +65,6 @@ export default function HomeScreen() {
   const [allRecords, setAllRecords] = useState<PoopRecord[]>([]);
   const [waterRecords, setWaterRecords] = useState<any[]>([]);
   const [appUi, setAppUi] = useState<AppUiPreferences | null>(null);
-  const [shareModalVisible, setShareModalVisible] = useState(false);
   const [smoothPickerVisible, setSmoothPickerVisible] = useState(false);
   const [waterQuickVisible, setWaterQuickVisible] = useState(false);
   
@@ -458,44 +456,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 健康提醒 */}
-        {healthAlert && (
-          <HealthAlert 
-            alert={healthAlert} 
-            onDismiss={() => setHealthAlert(null)}
-          />
-        )}
-
-        {/* 异常提醒 */}
-        {reminderStatus?.shouldRemind && (
-          <ModernCard elevation="md" padding="md" style={[styles.reminderCard, { backgroundColor: theme.colors.warning + '20' }]}>
-            <View style={styles.reminderContent}>
-              <FontAwesome name="exclamation-triangle" size={theme.iconSize.lg} color={theme.colors.warning} />
-              <View style={styles.reminderTextContainer}>
-                <Text style={[styles.reminderTitle, { color: theme.colors.warning }]}>
-                  {t('reminder.attention', 'Attention')}
-                </Text>
-                <Text style={styles.reminderMessage}>
-                  {reminderStatus.message}
-                </Text>
-              </View>
-            </View>
-          </ModernCard>
-        )}
-
-        {/* 距离上次排便时间 */}
-        {lastPoopTime && (
-          <ModernCard elevation="sm" padding="md" style={styles.lastPoopCard}>
-            <View style={styles.lastPoopContent}>
-              <FontAwesome name="clock-o" size={theme.iconSize.md} color={theme.colors.textSecondary} />
-              <Text style={styles.lastPoopText}>
-                {t('home.lastPoop')}: {lastPoopTime}
-              </Text>
-            </View>
-          </ModernCard>
-        )}
-
-        {/* 快速记录主按钮 - 涟漪 + 弹性缩放（设置里可关增强动效 / 系统 Reduce Motion 会降级） */}
+        {/* Quick record first: keep Home focused on the daily loop. */}
         <Animated.View style={[styles.primaryActionContainer, { transform: [{ translateY: slideAnim }] }]}>
           <View style={styles.quickRecordInner}>
             <Animated.View
@@ -531,43 +492,44 @@ export default function HomeScreen() {
             </Animated.View>
           </View>
         </Animated.View>
-
-        {totalRecords === 0 && (appUi?.emptyGuidanceEnabled ?? true) && (
-          <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
-            <HomeEmptyGuide />
-          </Animated.View>
+        {/* 健康提醒 */}
+        {healthAlert && (
+          <HealthAlert 
+            alert={healthAlert} 
+            onDismiss={() => setHealthAlert(null)}
+          />
         )}
 
-        {/* 饮水追踪 */}
-        <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
-          <WaterTracker onUpdate={loadData} />
-        </Animated.View>
-
-        {(appUi?.share7DaySummaryEnabled ?? true) && (
-          <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
-            <ModernCard elevation="sm" padding="md" style={{ marginBottom: theme.spacing.md }}>
-              <PrimaryButton
-                title={t('share.homeCta')}
-                onPress={() => setShareModalVisible(true)}
-                variant="outlined"
-                icon="share-alt"
-              />
-            </ModernCard>
-          </Animated.View>
+        {/* 异常提醒 */}
+        {reminderStatus?.shouldRemind && (
+          <ModernCard elevation="md" padding="md" style={[styles.reminderCard, { backgroundColor: theme.colors.primaryLight }]}>
+            <View style={styles.reminderContent}>
+              <FontAwesome name="info-circle" size={theme.iconSize.lg} color={theme.colors.primary} />
+              <View style={styles.reminderTextContainer}>
+                <AppText variant="h3" style={[styles.reminderTitle, { color: theme.colors.primaryDark }]}>
+                  {t('reminder.attention')}
+                </AppText>
+                <AppText variant="body2" color="secondary" style={styles.reminderMessage}>
+                  {reminderStatus.message}
+                </AppText>
+              </View>
+            </View>
+          </ModernCard>
         )}
 
-        {/* 数据可视化 */}
-        {allRecords.length > 0 && (
-          <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
-            <DataVisualization 
-              records={allRecords} 
-              waterRecords={waterRecords}
-              days={7}
-            />
-          </Animated.View>
+        {/* 距离上次排便时间 */}
+        {lastPoopTime && (
+          <ModernCard elevation="sm" padding="md" style={styles.lastPoopCard}>
+            <View style={styles.lastPoopContent}>
+              <FontAwesome name="clock-o" size={theme.iconSize.md} color={theme.colors.textSecondary} />
+              <AppText variant="body" color="secondary" style={styles.lastPoopText}>
+                {t('home.lastPoop')}: {lastPoopTime}
+              </AppText>
+            </View>
+          </ModernCard>
         )}
 
-        {/* 今日统计 */}
+        {/* Today's status */}
         <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
           <SectionHeader 
             title={t('home.todayStats')}
@@ -586,13 +548,35 @@ export default function HomeScreen() {
               color={designColors.accent}
             />
             <StatCard
-              icon="heartbeat"
+              icon="line-chart"
               value={healthScore}
               label={t('home.healthScore')}
               color={designColors.success}
             />
           </View>
         </Animated.View>
+
+        {totalRecords === 0 && (appUi?.emptyGuidanceEnabled ?? true) && (
+          <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
+            <HomeEmptyGuide />
+          </Animated.View>
+        )}
+
+        {/* 饮水追踪 */}
+        <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
+          <WaterTracker onUpdate={loadData} />
+        </Animated.View>
+
+        {/* 数据可视化 */}
+        {allRecords.length > 0 && (
+          <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
+            <DataVisualization 
+              records={allRecords} 
+              waterRecords={waterRecords}
+              days={7}
+            />
+          </Animated.View>
+        )}
 
         {/* 健康报告区域 - 轻量化 */}
         <Animated.View style={{ transform: [{ scale: cardScale }] }}>
@@ -607,10 +591,14 @@ export default function HomeScreen() {
                 activeOpacity={0.7}
                 style={styles.reportButtonTouchable}
               >
-                <Text style={styles.reportButtonIcon}>🌿</Text>
+                <View style={styles.reportIconWrap}>
+                  <FontAwesome name="calendar" size={theme.iconSize.lg} color={theme.colors.primary} />
+                </View>
                 <View style={styles.reportButtonTextContainer}>
-                  <Text style={styles.reportButtonTitle}>{t('health.weeklyReport')}</Text>
-                  <Text style={styles.reportButtonSubtitle}>{t('health.weeklyReportSubtitle')}</Text>
+                  <AppText variant="h3" style={styles.reportButtonTitle}>{t('health.weeklyReport')}</AppText>
+                  <AppText variant="body2" color="secondary" style={styles.reportButtonSubtitle}>
+                    {t('health.weeklyReportSubtitle')}
+                  </AppText>
                 </View>
               </TouchableOpacity>
             </ModernCard>
@@ -621,10 +609,14 @@ export default function HomeScreen() {
                 activeOpacity={0.7}
                 style={styles.reportButtonTouchable}
               >
-                <Text style={styles.reportButtonIcon}>📊</Text>
+                <View style={styles.reportIconWrap}>
+                  <FontAwesome name="bar-chart" size={theme.iconSize.lg} color={theme.colors.primary} />
+                </View>
                 <View style={styles.reportButtonTextContainer}>
-                  <Text style={styles.reportButtonTitle}>{t('health.monthlyReport')}</Text>
-                  <Text style={styles.reportButtonSubtitle}>{t('health.monthlyReportSubtitle')}</Text>
+                  <AppText variant="h3" style={styles.reportButtonTitle}>{t('health.monthlyReport')}</AppText>
+                  <AppText variant="body2" color="secondary" style={styles.reportButtonSubtitle}>
+                    {t('health.monthlyReportSubtitle')}
+                  </AppText>
                 </View>
               </TouchableOpacity>
             </ModernCard>
@@ -644,15 +636,10 @@ export default function HomeScreen() {
         editingRecord={editingRecord}
       />
 
-      <Share7DayModal
-        visible={shareModalVisible}
-        onClose={() => setShareModalVisible(false)}
-      />
-
       <QuickRecordSmoothModal
         visible={smoothPickerVisible}
         onClose={() => setSmoothPickerVisible(false)}
-        onConfirm={(level) => void completeQuickRecordWithLevel(level)}
+        onConfirm={(level: SmoothLevel) => void completeQuickRecordWithLevel(level)}
       />
 
       <WaterQuickLogModal
@@ -672,12 +659,17 @@ export default function HomeScreen() {
       >
         <View style={[styles.modalContainer, { backgroundColor: designColors.background }]}>
           <View style={[styles.modalHeader, { backgroundColor: designColors.surface, borderBottomColor: designColors.border }]}>
-            <Text
-              style={[styles.modalTitle, { color: designColors.textPrimary, flex: 1 }]}
-              numberOfLines={1}
-            >
-              {reportType === 'weekly' ? `📅 ${t('health.weeklyReport')}` : `📊 ${t('health.monthlyReport')}`}
-            </Text>
+            <View style={styles.modalTitleRow}>
+              <FontAwesome
+                name={reportType === 'weekly' ? 'calendar' : 'bar-chart'}
+                size={theme.iconSize.md}
+                color={designColors.textPrimary}
+                style={styles.modalTitleIcon}
+              />
+              <AppText variant="h3" style={[styles.modalTitle, { color: designColors.textPrimary }]} numberOfLines={1}>
+                {reportType === 'weekly' ? t('health.weeklyReport') : t('health.monthlyReport')}
+              </AppText>
+            </View>
             <Pressable
               onPress={closeReportModal}
               hitSlop={12}
@@ -753,11 +745,13 @@ const styles = StyleSheet.create({
   reportButtonTouchable: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: theme.spacing.sm,
+    padding: theme.spacing.md,
   },
-  reportButtonIcon: {
-    fontSize: theme.iconSize.lg,
+  reportIconWrap: {
     marginRight: theme.spacing.md,
+    width: theme.iconSize.lg + theme.spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   reportButtonTextContainer: {
     flex: 1,
@@ -778,11 +772,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     borderBottomWidth: 1,
     zIndex: 10,
     elevation: Platform.OS === 'android' ? 4 : 0,
+  },
+  modalTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: theme.spacing.sm,
+  },
+  modalTitleIcon: {
+    marginRight: theme.spacing.sm,
+  },
+  modalTitle: {
+    flex: 1,
+    minWidth: 0,
   },
   reportModalCloseHit: {
     padding: theme.spacing.sm,
@@ -795,43 +802,34 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 0,
   },
-  modalTitle: {
-    ...theme.typography.h3,
-    marginRight: theme.spacing.sm,
+  reminderCard: {
+    marginBottom: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.primaryLight,
   },
-         reminderCard: {
-           marginBottom: theme.spacing.md,
-           borderWidth: 1,
-           borderColor: theme.colors.warning,
-         },
-         reminderContent: {
-           flexDirection: 'row',
-           alignItems: 'center',
-         },
-         reminderTextContainer: {
-           flex: 1,
-           marginLeft: theme.spacing.md,
-         },
-         reminderTitle: {
-           ...theme.typography.h3,
-           marginBottom: theme.spacing.xs,
-           fontWeight: '600',
-         },
-         reminderMessage: {
-           ...theme.typography.body2,
-           color: theme.colors.textSecondary,
-         },
-         lastPoopCard: {
-           marginBottom: theme.spacing.md,
-         },
-         lastPoopContent: {
-           flexDirection: 'row',
-           alignItems: 'center',
-           justifyContent: 'center',
-         },
-         lastPoopText: {
-           ...theme.typography.body,
-           color: theme.colors.textSecondary,
-           marginLeft: theme.spacing.sm,
-         },
-       });
+  reminderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reminderTextContainer: {
+    flex: 1,
+    marginLeft: theme.spacing.md,
+  },
+  reminderTitle: {
+    ...theme.typography.h3,
+    marginBottom: theme.spacing.xs,
+    fontWeight: '600',
+  },
+  reminderMessage: {},
+  lastPoopCard: {
+    marginBottom: theme.spacing.md,
+  },
+  lastPoopContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lastPoopText: {
+    marginLeft: theme.spacing.sm,
+  },
+});

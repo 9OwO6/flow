@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, View, RefreshControl, Alert, TouchableOpacity, FlatList, ScrollView, Platform, Animated, Text as RNText } from 'react-native';
-import { Text } from '@/components/Themed';
+import { StyleSheet, View, RefreshControl, Alert, TouchableOpacity, FlatList, ScrollView, Platform, Animated } from 'react-native';
+import AppText from '@/components/design-system/AppText';
 import { Card, Chip, IconButton, Button, Dialog, Portal, TextInput, Surface } from 'react-native-paper';
 import { StorageService } from '@/utils/storage';
 import { PoopRecord, SmoothLevel } from '@/types';
@@ -50,11 +50,13 @@ export default function HistoryScreen() {
   const [hasRecordsInMonth, setHasRecordsInMonth] = useState(true);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<PoopRecord | null>(null);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [dayRecordsDialogVisible, setDayRecordsDialogVisible] = useState(false);
+  const [selectedDayRecords, setSelectedDayRecords] = useState<PoopRecord[]>([]);
   const [enhancedMotionPref, setEnhancedMotionPref] = useState(true);
   const [appUi, setAppUi] = useState<AppUiPreferences | null>(null);
   const reduceMotion = useReduceMotion();
 
-  // 动画状态
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
   const [cardScale] = useState(new Animated.Value(0.95));
@@ -63,7 +65,7 @@ export default function HistoryScreen() {
   const colors = Colors[colorScheme ?? 'light'];
   const designColors = theme.colors;
 
-  // 使用useFocusEffect来确保页面获得焦点时重新加载数据
+  // 浣跨敤useFocusEffect鏉ョ‘淇濋〉闈㈣幏寰楃劍鐐规椂閲嶆柊鍔犺浇鏁版嵁
   useFocusEffect(
     useCallback(() => {
       void delight.refreshPrefs();
@@ -73,7 +75,7 @@ export default function HistoryScreen() {
       });
       getAppUiPreferences().then(setAppUi);
       loadRecords();
-      // 页面加载动画
+      // 椤甸潰鍔犺浇鍔ㄧ敾
       Animated.parallel([
         createFadeInAnimation(fadeAnim, 800),
         createSlideInAnimation(slideAnim, 50, 800),
@@ -102,14 +104,13 @@ export default function HistoryScreen() {
   const filterRecords = (allRecords: PoopRecord[]) => {
     let filtered = [...allRecords];
 
-    // 根据视图类型过滤
+    // 鏍规嵁瑙嗗浘绫诲瀷杩囨护
     if (viewType === 'week') {
-      // 最近7天
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
       filtered = filtered.filter(record => new Date(record.timestamp) >= oneWeekAgo);
     } else if (viewType === 'month') {
-      // 当前月份
+      // 褰撳墠鏈堜唤
       const startOfMonth = new Date(selectedYear, selectedMonth, 1);
       const endOfMonth = new Date(selectedYear, selectedMonth + 1, 0);
       filtered = filtered.filter(record => {
@@ -117,14 +118,14 @@ export default function HistoryScreen() {
         return recordDate >= startOfMonth && recordDate <= endOfMonth;
       });
     } else if (viewType === 'year') {
-      // 当前年份
+      // 褰撳墠骞翠唤
       filtered = filtered.filter(record => {
         const recordDate = new Date(record.timestamp);
         return recordDate.getFullYear() === selectedYear;
       });
     }
 
-    // 搜索过滤
+    // 鎼滅储杩囨护
     if (searchQuery.trim()) {
       filtered = filtered.filter(record => 
         record.notes?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -146,64 +147,58 @@ export default function HistoryScreen() {
     filterRecords(records);
   };
 
-  const handleDeleteRecord = async (recordId: string) => {
+  const openRecordDetails = (record: PoopRecord) => {
+    setRecordToDelete(record);
+    setDeleteDialogVisible(true);
+  };
+
+  const openDayRecords = (dayRecords: PoopRecord[]) => {
+    if (dayRecords.length === 1) {
+      openRecordDetails(dayRecords[0]);
+      return;
+    }
+
+    setSelectedDayRecords(dayRecords);
+    setDayRecordsDialogVisible(true);
+  };
+
+  const confirmDeleteSelectedRecord = async () => {
+    if (!recordToDelete) {
+      return;
+    }
+
     try {
-      console.log('Preparing to delete record:', recordId);
-      
-      Alert.alert(
-        t('history.deleteTitle'),
-        t('history.deleteMessage'),
-        [
-          {
-            text: t('common.cancel'),
-            style: 'cancel',
-            onPress: () => void delight.play('tap'),
-          },
-                      {
-              text: t('history.deleteButton'),
-              style: 'destructive',
-            onPress: async () => {
-              try {
-                console.log('Deleting record:', recordId);
-        
-        const allRecords = await StorageService.getAllRecords();
-        const recordToDelete = allRecords.find(r => r.id === recordId);
-        
-        if (!recordToDelete) {
-          Alert.alert(t('history.deleteFailed'), t('history.recordNotFound'));
-          return;
-        }
-        
-        console.log('Found record to delete:', recordToDelete);
-                await StorageService.deleteRecord(recordId);
-                void delight.play('delete');
-                
-                // 重新加载数据
-                await loadRecords();
-                
-                        console.log('Delete successful, reloading data completed');
-        
-        // 显示删除成功提示
-        Alert.alert(t('history.deleteSuccess'), t('history.deleteSuccessMessage'));
-              } catch (error: any) {
-                console.error('Error deleting record:', error);
-                Alert.alert(t('history.deleteErrorMessage'), error.message || t('common.error'));
-              }
-            },
-          },
-        ]
-      );
-    } catch (error) {
-      console.error('Error in delete handler:', error);
+      const allRecords = await StorageService.getAllRecords();
+      const recordToDeleteCheck = allRecords.find(r => r.id === recordToDelete.id);
+
+      if (!recordToDeleteCheck) {
+        Alert.alert(t('common.error'), t('history.recordNotFound'));
+        return;
+      }
+
+      await StorageService.deleteRecord(recordToDelete.id);
+      void delight.play('delete');
+
+      await loadRecords();
+      setDeleteConfirmVisible(false);
+      setDeleteDialogVisible(false);
+      setDayRecordsDialogVisible(false);
+      setRecordToDelete(null);
+      setSelectedDayRecords([]);
+
+      Alert.alert(t('history.deleteSuccess'), t('history.deleteSuccessMessage'));
+    } catch (error: any) {
+      console.error('Error deleting record:', error);
+      Alert.alert(t('history.deleteError'), error.message || t('common.error'));
     }
   };
 
-  // 周视图 - 7天表格
+
   const renderWeekView = () => {
     const weekData = [];
     const today = new Date();
     
-    // 生成最近7天的数据
+    // 鐢熸垚鏈€杩?澶╃殑鏁版嵁
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
@@ -220,23 +215,23 @@ export default function HistoryScreen() {
 
     return (
       <ModernCard elevation="md" padding="lg">
-        <RNText style={[styles.viewTitle, { color: designColors.textPrimary }]}>{t('history.weekTitle')}</RNText>
+        <AppText style={[styles.viewTitle, { color: designColors.textPrimary }]}>{t('history.weekTitle')}</AppText>
           <View style={styles.weekTable}>
-            {/* 表头 */}
+            {/* 琛ㄥご */}
             <View style={styles.weekHeader}>
               {weekData.map((day, index) => (
                 <View key={index} style={[styles.dayHeader, day.isToday && { backgroundColor: colors.primary + '20' }]}>
-                  <Text style={[styles.dayName, { color: colors.text }, day.isToday && { color: colors.primary, fontWeight: 'bold' }]}>
+                  <AppText style={[styles.dayName, { color: colors.text }, day.isToday && { color: colors.primary, fontWeight: 'bold' }]}>
                     {day.dayName}
-                  </Text>
-                  <Text style={[styles.dayDate, { color: colors.text, opacity: 0.7 }]}>
+                  </AppText>
+                  <AppText style={[styles.dayDate, { color: colors.text, opacity: 0.7 }]}>
                     {new Date(day.date).getDate()}
-                  </Text>
+                  </AppText>
                 </View>
               ))}
             </View>
             
-            {/* 记录内容 */}
+            {/* 璁板綍鍐呭 */}
             <View style={styles.weekContent}>
               {weekData.map((day, index) => (
                 <View key={index} style={styles.dayColumn}>
@@ -252,24 +247,20 @@ export default function HistoryScreen() {
                           { borderColor: levelColor, backgroundColor: theme.colors.surfaceVariant },
                         ]}
                         onPress={() => {
-                                  console.log('Clicked record dot, Platform.OS:', Platform.OS);
-        console.log('Record info:', record);
                           
-                          // 设置要删除的记录并显示对话框
-                          setRecordToDelete(record);
-                          setDeleteDialogVisible(true);
+                          // 璁剧疆瑕佸垹闄ょ殑璁板綍骞舵樉绀哄璇濇
+                          openRecordDetails(record);
                         }}
-                        onLongPress={() => handleDeleteRecord(record.id)}
                       >
-                        <Text style={[styles.recordTime, { color: designColors.textPrimary }]}>
+                        <AppText style={[styles.recordTime, { color: designColors.textPrimary }]}>
                           {record.time.slice(0, 5)}
-                        </Text>
+                        </AppText>
                       </TouchableOpacity>
                     );
                     })
                   ) : (
                     <View style={styles.emptyDot}>
-                      <Text style={styles.emptyText}>-</Text>
+                      <AppText style={styles.emptyText}>-</AppText>
                     </View>
                   )}
                 </View>
@@ -280,7 +271,7 @@ export default function HistoryScreen() {
     );
   };
 
-  // 月视图 - 日历
+  // 鏈堣鍥?- 鏃ュ巻
   const renderMonthView = () => {
     const firstDay = new Date(selectedYear, selectedMonth, 1);
     const lastDay = new Date(selectedYear, selectedMonth + 1, 0);
@@ -290,7 +281,7 @@ export default function HistoryScreen() {
     const calendarDays = [];
     const currentDate = new Date(startWeek);
     
-    // 生成6周的日期
+    // 鐢熸垚6鍛ㄧ殑鏃ユ湡
     for (let week = 0; week < 6; week++) {
       const weekDays = [];
       for (let day = 0; day < 7; day++) {
@@ -311,7 +302,7 @@ export default function HistoryScreen() {
       calendarDays.push(weekDays);
     }
 
-    // 检查当前月份是否有记录
+    // 妫€鏌ュ綋鍓嶆湀浠芥槸鍚︽湁璁板綍
     const monthHasRecords = records.some(record => {
       const recordDate = new Date(record.timestamp);
       return recordDate.getFullYear() === selectedYear && recordDate.getMonth() === selectedMonth;
@@ -334,22 +325,22 @@ export default function HistoryScreen() {
               <IconButton icon="chevron-left" iconColor={designColors.primary} />
             </TouchableOpacity>
             <View style={styles.monthTitleContainer}>
-              <RNText style={[styles.monthTitle, { color: designColors.textPrimary }]}>
+              <AppText style={[styles.monthTitle, { color: designColors.textPrimary }]}>
                 {selectedYear} {getMonths()[selectedMonth]}
-              </RNText>
+              </AppText>
               {!monthHasRecords && (
                 <TouchableOpacity
                   onPress={() => {
-                    // 回到当前月份
+                    // 鍥炲埌褰撳墠鏈堜唤
                     const now = new Date();
                     setSelectedYear(now.getFullYear());
                     setSelectedMonth(now.getMonth());
                   }}
                   style={styles.backToCurrentButton}
                 >
-                  <Text style={styles.backToCurrentText}>
+                  <AppText style={styles.backToCurrentText}>
                     {t('history.backToCurrent')}
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               )}
             </View>
@@ -369,19 +360,19 @@ export default function HistoryScreen() {
           </View>
 
           <View style={styles.calendarContainer}>
-          {/* 星期标题 */}
+          {/* 鏄熸湡鏍囬 */}
           <View style={styles.weekTitleRow}>
             {getWeekDays().map((day, index) => (
-              <RNText
+              <AppText
                 key={index}
                 style={[styles.weekTitle, { color: designColors.primaryDark }]}
               >
                 {i18n.language === 'zh' ? day.replace('周', '') : day.substring(0, 3)}
-              </RNText>
+              </AppText>
             ))}
           </View>
 
-          {/* 日历内容 */}
+          {/* 鏃ュ巻鍐呭 */}
           {calendarDays.map((week, weekIndex) => (
             <View key={weekIndex} style={styles.calendarWeek}>
               {week.map((day, dayIndex) => (
@@ -394,19 +385,13 @@ export default function HistoryScreen() {
                   ]}
                   onPress={() => {
                     if (day.records.length > 0) {
-                      const recordsText = day.records.map(r => 
-                        `${r.time} - ${smoothLevelConfig[r.smoothLevel].label}`
-                      ).join('\n');
-                      Alert.alert(
-                        t('history.dayRecordsTitle', { day: day.date.getDate() }),
-                        recordsText
-                      );
+                      openDayRecords(day.records);
                     }
                   }}
                 >
-                  <Text style={[styles.calendarDayText, { color: colors.text }]}>
+                  <AppText style={[styles.calendarDayText, { color: colors.text }]}>
                     {day.date.getDate()}
-                  </Text>
+                  </AppText>
                   {day.records.length > 0 && (
                     <View style={styles.recordIndicators}>
                       {day.records.slice(0, 3).map((record, index) => (
@@ -416,7 +401,7 @@ export default function HistoryScreen() {
                         />
                       ))}
                       {day.records.length > 3 && (
-                        <Text style={styles.moreIndicator}>+{day.records.length - 3}</Text>
+                        <AppText style={styles.moreIndicator}>+{day.records.length - 3}</AppText>
                       )}
                     </View>
                   )}
@@ -429,7 +414,6 @@ export default function HistoryScreen() {
     );
   };
 
-  // 年视图 - 月份选择和统计
   const renderYearView = () => {
     const monthlyStats = getMonths().map((month, index) => {
       const monthRecords = records.filter(record => {
@@ -453,9 +437,9 @@ export default function HistoryScreen() {
           <TouchableOpacity onPress={() => setSelectedYear(selectedYear - 1)}>
             <IconButton icon="chevron-left" iconColor={designColors.primary} />
           </TouchableOpacity>
-          <RNText style={[styles.yearTitle, { color: designColors.textPrimary }]}>
+          <AppText style={[styles.yearTitle, { color: designColors.textPrimary }]}>
             {selectedYear} {t('history.yearTitle')}
-          </RNText>
+          </AppText>
           <TouchableOpacity onPress={() => setSelectedYear(selectedYear + 1)}>
             <IconButton icon="chevron-right" iconColor={designColors.primary} />
           </TouchableOpacity>
@@ -471,16 +455,16 @@ export default function HistoryScreen() {
                 setViewType('month');
               }}
             >
-              <Text style={[styles.monthCardTitle, { color: designColors.textPrimary }]}>
+              <AppText style={[styles.monthCardTitle, { color: designColors.textPrimary }]}>
                 {item.month}
-              </Text>
+              </AppText>
               <View style={styles.monthCardCountContainer}>
-                <Text style={[styles.monthCardCount, { color: designColors.primary }]}>
+                <AppText style={[styles.monthCardCount, { color: designColors.primary }]}>
                   {item.count}
-                </Text>
-                <Text style={[styles.monthCardCountLabel, { color: designColors.textSecondary }]}>
+                </AppText>
+                <AppText style={[styles.monthCardCountLabel, { color: designColors.textSecondary }]}>
                   {t('history.times')}
-                </Text>
+                </AppText>
               </View>
               {item.count > 0 && (
                 <View style={[styles.monthCardLevel, { backgroundColor: smoothLevelConfig[Math.round(item.avgSmoothLevel) as SmoothLevel]?.color || designColors.border }]} />
@@ -513,12 +497,10 @@ export default function HistoryScreen() {
     }
   };
 
-  // 当选择改变时重新过滤数据
   useEffect(() => {
     filterRecords(records);
   }, [viewType, selectedYear, selectedMonth, searchQuery]);
 
-  // 获取周/月名称（使用i18n）
   const getWeekDays = () => {
     const weekDays = t('history.weekDays', { returnObjects: true });
     return Array.isArray(weekDays) ? weekDays : 
@@ -536,15 +518,15 @@ export default function HistoryScreen() {
 
   return (
     <SwipeableContainer style={[styles.container, { backgroundColor: designColors.background }]}>
-      {/* 标题区域 */}
+      {/* 鏍囬鍖哄煙 */}
       <Animated.View style={[styles.header, { backgroundColor: colors.surface, opacity: fadeAnim }]}>
-        <RNText style={[styles.title, { color: colors.text }]}>{t('history.title')}</RNText>
-        <RNText style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
+        <AppText style={[styles.title, { color: colors.text }]}>{t('history.title')}</AppText>
+        <AppText style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
           {getStatsText()}
-        </RNText>
+        </AppText>
       </Animated.View>
 
-      {/* 视图切换和搜索 */}
+      {/* 瑙嗗浘鍒囨崲鍜屾悳绱?*/}
       <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
         <SegmentedTabs
           tabs={[
@@ -565,7 +547,7 @@ export default function HistoryScreen() {
         )}
       </Animated.View>
 
-      {/* 内容区域 */}
+      {/* 鍐呭鍖哄煙 */}
       <Animated.ScrollView 
         style={[styles.contentArea, { opacity: fadeAnim }]}
         refreshControl={
@@ -593,8 +575,8 @@ export default function HistoryScreen() {
               <ModernCard elevation="md" padding="lg">
                 <EmptyState
                   icon="inbox"
-                  title={t('history.noRecordsInMonth', '本月暂无记录')}
-                  subtitle={t('history.noRecordsInMonthSubtitle', '可以切换月份查看其他时间的记录')}
+                  title={t('history.noRecordsInMonth')}
+                  subtitle={t('history.noRecordsInMonthSubtitle')}
                 />
               </ModernCard>
               {renderMonthView()}
@@ -621,63 +603,109 @@ export default function HistoryScreen() {
         </HistoryContentTransition>
       </Animated.ScrollView>
 
-      {/* 删除确认对话框 */}
+      {/* 鍒犻櫎纭瀵硅瘽妗?*/}
       <Portal>
         <Dialog visible={deleteDialogVisible} onDismiss={() => setDeleteDialogVisible(false)}>
           <Dialog.Title>{t('history.recordDetails')}</Dialog.Title>
           <Dialog.Content>
             {recordToDelete && (
               <View>
-                <Text style={{ marginBottom: 8 }}>
-                  <Text style={{ fontWeight: 'bold' }}>{t('history.time')}:</Text> {recordToDelete.time}
-                </Text>
-                <Text style={{ marginBottom: 8 }}>
-                  <Text style={{ fontWeight: 'bold' }}>{t('history.feeling')}:</Text> {smoothLevelConfig[recordToDelete.smoothLevel].label}
-                </Text>
-                <Text style={{ marginBottom: 8 }}>
-                  <Text style={{ fontWeight: 'bold' }}>{t('history.notes')}:</Text> {recordToDelete.notes || t('history.none')}
-                </Text>
-    </View>
+                <AppText style={{ marginBottom: theme.spacing.sm }}>
+                  <AppText style={{ fontWeight: 'bold' }}>{t('history.time')}:</AppText> {recordToDelete.time}
+                </AppText>
+                <AppText style={{ marginBottom: theme.spacing.sm }}>
+                  <AppText style={{ fontWeight: 'bold' }}>{t('history.feeling')}:</AppText>{' '}
+                  {smoothLevelConfig[recordToDelete.smoothLevel].label}
+                </AppText>
+                <AppText style={{ marginBottom: theme.spacing.sm }}>
+                  <AppText style={{ fontWeight: 'bold' }}>{t('history.notes')}:</AppText> {recordToDelete.notes || t('history.none')}
+                </AppText>
+              </View>
             )}
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setDeleteDialogVisible(false)}>{t('common.close')}</Button>
-            <Button 
-              mode="contained" 
-              buttonColor="#FF6B6B"
-              onPress={async () => {
-                if (recordToDelete) {
-                  try {
-                    console.log('Deleting record:', recordToDelete.id);
-                    
-                    const allRecords = await StorageService.getAllRecords();
-                    const recordToDeleteCheck = allRecords.find(r => r.id === recordToDelete.id);
-                    
-                    if (!recordToDeleteCheck) {
-                      Alert.alert(t('common.error'), t('history.recordNotFound'));
-                      return;
-                    }
-                    
-                    console.log('Found record to delete:', recordToDeleteCheck);
-                    await StorageService.deleteRecord(recordToDelete.id);
-                    void delight.play('delete');
-                    
-                    await loadRecords();
-                    
-                    console.log('Delete successful, reloading data completed');
-                    
-                    setDeleteDialogVisible(false);
-                    setRecordToDelete(null);
-                    
-                    Alert.alert(t('history.deleteSuccess'), t('history.deleteSuccessMessage'));
-                  } catch (error: any) {
-                    console.error('Error deleting record:', error);
-                    Alert.alert(t('history.deleteError'), error.message || t('common.error'));
-                  }
-                }
-              }}
+            <Button
+              mode="contained"
+              buttonColor={theme.colors.error}
+              textColor={theme.colors.textOnPrimary}
+              onPress={() => setDeleteConfirmVisible(true)}
             >
               {t('common.delete')}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+
+        <Dialog
+          visible={dayRecordsDialogVisible}
+          onDismiss={() => {
+            setDayRecordsDialogVisible(false);
+            setSelectedDayRecords([]);
+          }}
+        >
+          <Dialog.Title>
+            {t('history.dayRecordsTitle', {
+              day: selectedDayRecords[0]
+                ? new Date(selectedDayRecords[0].timestamp).getDate()
+                : '',
+            })}
+          </Dialog.Title>
+          <Dialog.Content>
+            {selectedDayRecords.map(record => (
+              <TouchableOpacity
+                key={record.id}
+                style={styles.dayRecordRow}
+                onPress={() => {
+                  setDayRecordsDialogVisible(false);
+                  openRecordDetails(record);
+                }}
+              >
+                <View
+                  style={[
+                    styles.recordIndicator,
+                    { backgroundColor: smoothLevelConfig[record.smoothLevel].color },
+                  ]}
+                />
+                <View style={styles.dayRecordText}>
+                  <AppText style={styles.dayRecordTime}>{record.time}</AppText>
+                  <AppText style={styles.dayRecordMeta}>
+                    {smoothLevelConfig[record.smoothLevel].label}
+                  </AppText>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => {
+                setDayRecordsDialogVisible(false);
+                setSelectedDayRecords([]);
+              }}
+            >
+              {t('common.close')}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+
+        <Dialog
+          visible={deleteConfirmVisible}
+          onDismiss={() => setDeleteConfirmVisible(false)}
+        >
+          <Dialog.Title>{t('history.deleteTitle')}</Dialog.Title>
+          <Dialog.Content>
+            <AppText>{t('history.deleteMessage')}</AppText>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setDeleteConfirmVisible(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              mode="contained"
+              buttonColor={theme.colors.error}
+              textColor={theme.colors.textOnPrimary}
+              onPress={() => void confirmDeleteSelectedRecord()}
+            >
+              {t('history.deleteButton')}
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -747,7 +775,6 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
   },
   
-  // 周视图样式
   weekContainer: {
     paddingVertical: 16,
     borderRadius: 16,
@@ -824,7 +851,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  // 月视图样式
   monthContainer: {
     paddingVertical: 16,
     borderRadius: 16,
@@ -913,8 +939,28 @@ const styles = StyleSheet.create({
     marginLeft: 2,
     fontWeight: '600',
   },
+  dayRecordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  dayRecordText: {
+    flex: 1,
+  },
+  dayRecordTime: {
+    ...theme.typography.body,
+    color: theme.colors.textPrimary,
+    fontWeight: '700',
+  },
+  dayRecordMeta: {
+    ...theme.typography.caption,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+  },
 
-  // 年视图样式
   yearContainer: {
     paddingVertical: 16,
     borderRadius: 16,
@@ -937,8 +983,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   monthCard: {
-    width: '31%', // 3列布局，留出间距
-    padding: theme.spacing.md,
+    width: '31%', // 3鍒楀竷灞€锛岀暀鍑洪棿璺?    padding: theme.spacing.md,
     borderRadius: theme.radius.lg,
     alignItems: 'center',
     borderWidth: 1,

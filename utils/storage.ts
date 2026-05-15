@@ -42,22 +42,16 @@ export class StorageService {
   // 删除记录
   static async deleteRecord(id: string): Promise<void> {
     try {
-      console.log('StorageService: Starting to delete record, ID:', id);
       const records = await this.getAllRecords();
-      console.log('StorageService: Current total records:', records.length);
       
       const recordToDelete = records.find(r => r.id === id);
       if (!recordToDelete) {
-        console.log('StorageService: Record to delete not found');
         throw new Error('Record to delete not found');
       }
       
-      console.log('StorageService: Found record to delete:', recordToDelete);
       const filteredRecords = records.filter(record => record.id !== id);
-      console.log('StorageService: Records count after deletion:', filteredRecords.length);
       
       await AsyncStorage.setItem(STORAGE_KEYS.POOP_RECORDS, JSON.stringify(filteredRecords));
-      console.log('StorageService: Delete successful');
     } catch (error) {
       console.error('StorageService: Error deleting record:', error);
       throw error;

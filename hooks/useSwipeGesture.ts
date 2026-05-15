@@ -14,7 +14,8 @@ export function useSwipeGesture() {
   const isSwiping = useRef(false);
   const isSwitching = useRef(false); // 是否正在切换
   const lastSwitchTime = useRef(0); // 上次切换的时间
-  const switchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const switchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const translateXValueRef = useRef(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   // 清理函数：组件卸载时重置状态
@@ -31,6 +32,15 @@ export function useSwipeGesture() {
       isSwitching.current = false;
       isSwiping.current = false;
       translateX.setValue(0);
+    };
+  }, [translateX]);
+
+  useEffect(() => {
+    const id = translateX.addListener(({ value }) => {
+      translateXValueRef.current = value;
+    });
+    return () => {
+      translateX.removeListener(id);
     };
   }, [translateX]);
 
@@ -212,7 +222,8 @@ export function useSwipeGesture() {
           }
           
           isSwiping.current = true;
-          translateX.setOffset(translateX._value);
+          translateX.setOffset(translateXValueRef.current);
+          translateXValueRef.current = 0;
           translateX.setValue(0);
         },
         onPanResponderMove: (evt, gestureState) => {
@@ -225,6 +236,7 @@ export function useSwipeGesture() {
           const screenWidth = Dimensions.get('window').width;
           const maxTranslate = screenWidth * 0.8;
           const clampedDx = Math.max(-maxTranslate, Math.min(maxTranslate, gestureState.dx));
+          translateXValueRef.current = clampedDx;
           translateX.setValue(clampedDx);
         },
         onPanResponderRelease: (evt, gestureState) => {

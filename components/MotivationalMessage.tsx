@@ -1,21 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
-import { Card, Text, Button } from 'react-native-paper';
+import { Card, Button } from 'react-native-paper';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from './useColorScheme';
+import AppText from '@/components/design-system/AppText';
+import theme from '@/constants/DesignTokens';
+
+type QuoteIcon = React.ComponentProps<typeof FontAwesome>['name'];
 
 interface Achievement {
   id: string;
   title: string;
   description: string;
-  emoji: string;
   unlocked: boolean;
 }
 
 interface MotivationalMessageProps {
   recordCount: number;
   onClose?: () => void;
+}
+
+function quoteForCount(recordCount: number, t: TFunction): { text: string; icon: QuoteIcon } {
+  const raw = t('motivational.default', { returnObjects: true });
+  const quotes = Array.isArray(raw) ? (raw as { text: string; emoji: string }[]) : [];
+
+  if (recordCount === 1) return { text: t('motivational.firstRecord'), icon: 'star' };
+  if (recordCount === 7) return { text: t('motivational.weekRecord'), icon: 'certificate' };
+  if (recordCount === 30) return { text: t('motivational.monthRecord'), icon: 'sun-o' };
+  if (recordCount === 100) return { text: t('motivational.monthRecord'), icon: 'trophy' };
+  if (recordCount % 10 === 0) return { text: t('motivational.recordCount', { count: recordCount }), icon: 'fire' };
+
+  if (quotes.length === 0) {
+    return { text: t('motivational.firstRecord'), icon: 'leaf' };
+  }
+  const q = quotes[Math.floor(Math.random() * quotes.length)];
+  return { text: q.text, icon: 'comment-o' };
 }
 
 export default function MotivationalMessage({ recordCount, onClose }: MotivationalMessageProps) {
@@ -25,45 +47,44 @@ export default function MotivationalMessage({ recordCount, onClose }: Motivation
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
 
-  // 成就系统
   const achievements: Achievement[] = [
-    { id: 'first', title: t('achievements.first.title'), description: t('achievements.first.description'), emoji: t('achievements.first.emoji'), unlocked: recordCount >= 1 },
-    { id: 'week', title: t('achievements.week.title'), description: t('achievements.week.description'), emoji: t('achievements.week.emoji'), unlocked: recordCount >= 7 },
-    { id: 'month', title: t('achievements.month.title'), description: t('achievements.month.description'), emoji: t('achievements.month.emoji'), unlocked: recordCount >= 30 },
-    { id: 'hundred', title: t('achievements.hundred.title'), description: t('achievements.hundred.description'), emoji: t('achievements.hundred.emoji'), unlocked: recordCount >= 100 },
+    {
+      id: 'first',
+      title: t('achievements.first.title'),
+      description: t('achievements.first.description'),
+      unlocked: recordCount >= 1,
+    },
+    {
+      id: 'week',
+      title: t('achievements.week.title'),
+      description: t('achievements.week.description'),
+      unlocked: recordCount >= 7,
+    },
+    {
+      id: 'month',
+      title: t('achievements.month.title'),
+      description: t('achievements.month.description'),
+      unlocked: recordCount >= 30,
+    },
+    {
+      id: 'hundred',
+      title: t('achievements.hundred.title'),
+      description: t('achievements.hundred.description'),
+      unlocked: recordCount >= 100,
+    },
   ];
 
-  // 鼓励语句
-  const getMotivationalQuote = () => {
-    const quotes = t('motivational.default', { returnObjects: true }) as Array<{text: string, emoji: string}>;
-
-    if (recordCount === 1) {
-      return { text: t('motivational.firstRecord'), emoji: '🎉' };
-    } else if (recordCount === 7) {
-      return { text: t('motivational.weekRecord'), emoji: '🎊' };
-    } else if (recordCount === 30) {
-      return { text: t('motivational.monthRecord'), emoji: '🌟' };
-    } else if (recordCount === 100) {
-      return { text: t('motivational.monthRecord'), emoji: '👑' };
-    } else if (recordCount % 10 === 0) {
-      return { text: t('motivational.recordCount', { count: recordCount }), emoji: '🔥' };
-    }
-
-    return quotes[Math.floor(Math.random() * quotes.length)];
-  };
-
-  const getCurrentAchievement = () => {
-    return achievements.find(achievement => 
-      achievement.unlocked && 
-      (recordCount === 1 || recordCount === 7 || recordCount === 30 || recordCount === 100)
+  const getCurrentAchievement = () =>
+    achievements.find(
+      (a) =>
+        a.unlocked &&
+        (recordCount === 1 || recordCount === 7 || recordCount === 30 || recordCount === 100)
     );
-  };
 
-  const quote = getMotivationalQuote();
+  const quote = quoteForCount(recordCount, t);
   const currentAchievement = getCurrentAchievement();
 
   useEffect(() => {
-    // 入场动画
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -77,62 +98,73 @@ export default function MotivationalMessage({ recordCount, onClose }: Motivation
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeAnim, scaleAnim]);
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.container,
         {
           opacity: fadeAnim,
           transform: [{ scale: scaleAnim }],
-        }
+        },
       ]}
     >
       <Card style={[styles.card, { backgroundColor: colors.card }]}>
         <Card.Content style={styles.content}>
-          {/* 成就展示 */}
-          {currentAchievement && (
+          {currentAchievement ? (
             <View style={[styles.achievementContainer, { backgroundColor: colors.success + '20' }]}>
-              <Text style={styles.achievementEmoji}>{currentAchievement.emoji}</Text>
+              <View style={styles.achievementIcon}>
+                <FontAwesome name="trophy" size={theme.iconSize.lg} color={colors.success} />
+              </View>
               <View style={styles.achievementText}>
-                <Text style={[styles.achievementTitle, { color: colors.success }]}>
+                <AppText variant="caption" style={[styles.achievementTitle, { color: colors.success }]}>
                   {t('achievements.unlocked')}
-                </Text>
-                <Text style={[styles.achievementName, { color: colors.text }]}>
+                </AppText>
+                <AppText variant="h3" style={[styles.achievementName, { color: colors.text }]}>
                   {currentAchievement.title}
-                </Text>
-                <Text style={[styles.achievementDesc, { color: colors.text, opacity: 0.7 }]}>
+                </AppText>
+                <AppText variant="body2" color="secondary" style={[styles.achievementDesc, { color: colors.text, opacity: 0.7 }]}>
                   {currentAchievement.description}
-                </Text>
+                </AppText>
               </View>
             </View>
-          )}
+          ) : null}
 
-          {/* 鼓励消息 */}
           <View style={styles.messageContainer}>
-            <Text style={styles.messageEmoji}>{quote.emoji}</Text>
-            <Text style={[styles.messageText, { color: colors.text }]}>
+            <FontAwesome name={quote.icon} size={theme.iconSize.lg} color={theme.colors.primary} style={styles.quoteIcon} />
+            <AppText variant="h3" style={[styles.messageText, { color: colors.text }]}>
               {quote.text}
-            </Text>
+            </AppText>
           </View>
 
-          {/* 统计信息 */}
           <View style={[styles.statsContainer, { backgroundColor: colors.background }]}>
-            <Text style={[styles.statsText, { color: colors.text }]}>
-              📈 {t('achievements.totalRecords')}：<Text style={{ fontWeight: 'bold', color: colors.primary }}>{recordCount}</Text>
-            </Text>
-            
-            {recordCount >= 7 && (
-              <Text style={[styles.statsText, { color: colors.text }]}>
-                🎯 {t('achievements.weeklyAverage')}：<Text style={{ fontWeight: 'bold', color: colors.secondary }}>{Math.round(recordCount / Math.ceil(recordCount / 7))}</Text> {t('achievements.times')}
-              </Text>
-            )}
+            <View style={styles.statsRow}>
+              <FontAwesome name="line-chart" size={theme.iconSize.sm} color={colors.text} style={styles.statsRowIcon} />
+              <AppText variant="body2" style={[styles.statsText, { color: colors.text }]}>
+                {t('achievements.totalRecords')}：
+                <AppText variant="body2" style={{ fontWeight: 'bold', color: colors.primary }}>
+                  {recordCount}
+                </AppText>
+              </AppText>
+            </View>
+
+            {recordCount >= 7 ? (
+              <View style={styles.statsRow}>
+                <FontAwesome name="bullseye" size={theme.iconSize.sm} color={colors.text} style={styles.statsRowIcon} />
+                <AppText variant="body2" style={[styles.statsText, { color: colors.text }]}>
+                  {t('achievements.weeklyAverage')}：
+                  <AppText variant="body2" style={{ fontWeight: 'bold', color: colors.secondary }}>
+                    {Math.round(recordCount / Math.ceil(recordCount / 7))}
+                  </AppText>{' '}
+                  {t('achievements.times')}
+                </AppText>
+              </View>
+            ) : null}
           </View>
 
-          {/* 关闭按钮 */}
-          <Button 
-            mode="contained" 
+          <Button
+            mode="contained"
             onPress={onClose}
             style={[styles.closeButton, { backgroundColor: colors.primary }]}
             labelStyle={{ color: 'white', fontWeight: 'bold' }}
@@ -158,73 +190,68 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   card: {
-    margin: 20,
-    borderRadius: 20,
+    margin: theme.spacing.md,
+    borderRadius: theme.radius.lg,
     elevation: 8,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
   content: {
-    padding: 24,
+    padding: theme.spacing.lg,
   },
   achievementContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 20,
+    padding: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    marginBottom: theme.spacing.md,
   },
-  achievementEmoji: {
-    fontSize: 40,
-    marginRight: 16,
+  achievementIcon: {
+    marginRight: theme.spacing.md,
   },
   achievementText: {
     flex: 1,
   },
   achievementTitle: {
-    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   achievementName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
-  achievementDesc: {
-    fontSize: 14,
-  },
+  achievementDesc: {},
   messageContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: theme.spacing.md,
   },
-  messageEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
+  quoteIcon: {
+    marginBottom: theme.spacing.sm,
   },
   messageText: {
-    fontSize: 18,
-    fontWeight: '600',
     textAlign: 'center',
-    lineHeight: 24,
   },
   statsContainer: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 20,
+    padding: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    marginBottom: theme.spacing.md,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing.xs,
+  },
+  statsRowIcon: {
+    marginRight: theme.spacing.sm,
   },
   statsText: {
-    fontSize: 14,
-    marginBottom: 4,
     textAlign: 'center',
+    flexShrink: 1,
   },
   closeButton: {
-    borderRadius: 12,
-    paddingVertical: 4,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.xs,
   },
-}); 
+});

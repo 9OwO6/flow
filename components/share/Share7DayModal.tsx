@@ -9,10 +9,11 @@ import {
   useWindowDimensions,
   Platform,
 } from 'react-native';
-import { Text } from '@/components/Themed';
-import { useTranslation } from 'react-i18next';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import theme from '@/constants/DesignTokens';
 import PrimaryButton from '@/components/design-system/PrimaryButton';
+import AppText from '@/components/design-system/AppText';
+import { useTranslation } from 'react-i18next';
 import SevenDayShareCard, {
   type SevenDayShareCardStrings,
 } from '@/components/share/SevenDayShareCard';
@@ -148,9 +149,9 @@ export default function Share7DayModal({ visible, onClose }: Props) {
     >
       <View style={[styles.wrap, { maxHeight: height * 0.95 }]}>
         <View style={styles.header}>
-          <Text style={styles.title} numberOfLines={1}>
+          <AppText variant="h3" style={styles.title} numberOfLines={1}>
             {t('share.modalTitle')}
-          </Text>
+          </AppText>
           <Pressable
             onPress={onClose}
             hitSlop={16}
@@ -158,19 +159,23 @@ export default function Share7DayModal({ visible, onClose }: Props) {
             accessibilityLabel={t('common.close')}
             style={({ pressed }) => [styles.closeBtn, pressed && styles.closeBtnPressed]}
           >
-            <Text style={styles.close}>✕</Text>
+            <FontAwesome name="close" size={22} color={theme.colors.textPrimary} />
           </Pressable>
         </View>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           {loading && (
-            <ActivityIndicator color={theme.colors.primary} style={{ margin: 24 }} />
+            <ActivityIndicator color={theme.colors.primary} style={{ margin: theme.spacing.md }} />
           )}
           {!loading && payload && payload.total < 1 && (
-            <Text style={styles.muted}>{t('share.notEnoughData')}</Text>
+            <AppText variant="body" color="secondary" style={styles.muted}>
+              {t('share.notEnoughData')}
+            </AppText>
           )}
           {!loading && payload && payload.total >= 1 && (
             <>
-              <Text style={styles.previewCaption}>{t('share.previewCaption')}</Text>
+              <AppText variant="caption" color="tertiary" style={styles.previewCaption}>
+                {t('share.previewCaption')}
+              </AppText>
               <View style={styles.previewBox}>
                 <View style={{ transform: [{ scale: 0.86 }] }}>
                   <SevenDayShareCard
@@ -195,7 +200,9 @@ export default function Share7DayModal({ visible, onClose }: Props) {
                 </View>
               </View>
 
-              <Text style={styles.note}>{t('share.localNote')}</Text>
+              <AppText variant="caption" color="tertiary" style={styles.note}>
+                {t('share.localNote')}
+              </AppText>
               <PrimaryButton
                 title={sharing ? t('share.sharing') : t('share.sharePng')}
                 onPress={() => void onShare()}
@@ -228,8 +235,6 @@ const styles = StyleSheet.create({
     elevation: Platform.OS === 'android' ? 6 : 0,
   },
   title: {
-    ...theme.typography.h3,
-    color: theme.colors.textPrimary,
     flex: 1,
     marginRight: theme.spacing.md,
   },
@@ -243,18 +248,11 @@ const styles = StyleSheet.create({
   closeBtnPressed: {
     opacity: 0.65,
   },
-  close: {
-    ...theme.typography.h3,
-    color: theme.colors.textPrimary,
-    fontWeight: '600',
-  },
   body: {
     padding: theme.spacing.lg,
     paddingBottom: theme.spacing.xl * 2,
   },
   previewCaption: {
-    ...theme.typography.caption,
-    color: theme.colors.textTertiary,
     marginBottom: theme.spacing.sm,
   },
   previewBox: {
@@ -271,14 +269,10 @@ const styles = StyleSheet.create({
     opacity: 1,
   },
   note: {
-    ...theme.typography.caption,
-    color: theme.colors.textTertiary,
     marginBottom: theme.spacing.md,
     textAlign: 'center',
   },
   muted: {
-    ...theme.typography.body,
-    color: theme.colors.textSecondary,
     textAlign: 'center',
     marginTop: theme.spacing.xl,
   },

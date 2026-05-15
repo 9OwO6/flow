@@ -96,12 +96,13 @@ export const iconSize = {
   xl: 48,
 };
 
+/** 8pt grid: 8 / 12 / 16 / 24 (+32 for rare hero gaps) */
 export const spacing = {
-  xs: 6,
+  xs: 8,
   sm: 12,
-  md: 20,
-  lg: 32,
-  xl: 48,
+  md: 16,
+  lg: 24,
+  xl: 32,
 };
 
 export const radius = {

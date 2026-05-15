@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import { Animated, StyleSheet, ViewStyle, View, type DimensionValue } from 'react-native';
 import theme from '@/constants/DesignTokens';
+import { useReduceMotion } from '@/hooks/useReduceMotion';
 
 interface SkeletonLoaderProps {
-  width?: number | string;
+  width?: DimensionValue;
   height?: number;
   borderRadius?: number;
-  style?: any;
+  style?: ViewStyle | ViewStyle[];
 }
 
 export default function SkeletonLoader({
@@ -15,40 +16,66 @@ export default function SkeletonLoader({
   borderRadius = theme.radius.sm,
   style,
 }: SkeletonLoaderProps) {
-  const shimmerAnim = useRef(new Animated.Value(0)).current;
+  const reduceMotion = useReduceMotion();
+  const shimmerAnim = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
-    Animated.loop(
+    if (reduceMotion) {
+      shimmerAnim.setValue(0.45);
+      return undefined;
+    }
+
+    const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(shimmerAnim, {
-          toValue: 1,
-          duration: 1000,
+          toValue: 0.75,
+          duration: 900,
           useNativeDriver: true,
         }),
         Animated.timing(shimmerAnim, {
-          toValue: 0,
-          duration: 1000,
+          toValue: 0.35,
+          duration: 900,
           useNativeDriver: true,
         }),
       ])
-    ).start();
-  }, []);
+    );
+    loop.start();
 
-  const opacity = shimmerAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.3, 0.7],
-  });
+    return () => {
+      loop.stop();
+    };
+  }, [reduceMotion, shimmerAnim]);
+
+  const bg = theme.colors.surfaceVariant;
+
+  if (reduceMotion) {
+    return (
+      <View
+        style={[
+          styles.base,
+          {
+            width,
+            height,
+            borderRadius,
+            backgroundColor: bg,
+            opacity: 0.55,
+          },
+          style,
+        ]}
+      />
+    );
+  }
 
   return (
     <Animated.View
       style={[
-        styles.skeleton,
+        styles.base,
         {
           width,
           height,
           borderRadius,
-          opacity,
-          backgroundColor: theme.colors.border,
+          opacity: shimmerAnim,
+          backgroundColor: bg,
         },
         style,
       ]}
@@ -57,8 +84,7 @@ export default function SkeletonLoader({
 }
 
 const styles = StyleSheet.create({
-  skeleton: {
+  base: {
     overflow: 'hidden',
   },
 });
-

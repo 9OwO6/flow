@@ -1,11 +1,11 @@
 /**
- * Learn more about Light and Dark modes:
- * https://docs.expo.io/guides/color-schemes/
+ * Theme-aware primitives; Text delegates to AppText for unified typography tokens.
  */
 
 import { Text as DefaultText, View as DefaultView } from 'react-native';
 
 import Colors from '@/constants/Colors';
+import AppText from '@/components/design-system/AppText';
 import { useColorScheme } from './useColorScheme';
 
 type ThemeProps = {
@@ -32,9 +32,21 @@ export function useThemeColor(
 
 export function Text(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const scheme = useColorScheme() ?? 'light';
+  const fromProps =
+    scheme === 'dark'
+      ? darkColor ?? lightColor
+      : lightColor ?? darkColor;
+  const fallback =
+    scheme === 'dark' ? Colors.dark.text : Colors.light.text;
 
-  return <DefaultText style={[{ color }, style]} {...otherProps} />;
+  return (
+    <AppText
+      variant="body"
+      style={[{ color: fromProps ?? fallback }, style]}
+      {...otherProps}
+    />
+  );
 }
 
 export function View(props: ViewProps) {

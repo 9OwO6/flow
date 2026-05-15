@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { Card, Text, Chip, Button } from 'react-native-paper';
+import { Card, Chip, Button } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { HealthReport, HealthReportService } from '@/utils/healthReport';
 import { SmoothLevel } from '@/types';
@@ -8,11 +8,14 @@ import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 
 interface HealthReportProps {
   report: HealthReport;
   onClose?: () => void;
 }
+
+type PatternRating = 'excellent' | 'good' | 'fair' | 'poor';
 
 const smoothLevelColor: Record<SmoothLevel, string> = {
   [SmoothLevel.VERY_DIFFICULT]: theme.colors.smoothLevel.veryDifficult,
@@ -39,18 +42,22 @@ function smoothLevelI18nKey(level: SmoothLevel): string {
   }
 }
 
+function ratingI18nKey(prefix: 'regularity' | 'comfort' | 'pattern', rating: PatternRating): string {
+  const suffix =
+    rating === 'excellent'
+      ? 'Excellent'
+      : rating === 'good'
+        ? 'Good'
+        : rating === 'fair'
+          ? 'Fair'
+          : 'Poor';
+  return `healthReport.${prefix}Band${suffix}`;
+}
+
 export default function HealthReportComponent({ report, onClose }: HealthReportProps) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
-
-  const smoothEmoji: Record<SmoothLevel, string> = {
-    [SmoothLevel.VERY_DIFFICULT]: '😰',
-    [SmoothLevel.DIFFICULT]: '😔',
-    [SmoothLevel.NORMAL]: '😐',
-    [SmoothLevel.SMOOTH]: '😊',
-    [SmoothLevel.VERY_SMOOTH]: '😄',
-  };
 
   const scoreBandLabel =
     report.healthScore >= 80
@@ -69,10 +76,10 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.scoreTitle}>{t('healthReport.scoreTitle')}</Text>
-        <Text style={styles.scoreValue}>{report.healthScore}</Text>
-        <Text style={styles.scoreMax}>{t('healthReport.scoreOutOf')}</Text>
-        <Text style={styles.scoreDescription}>{scoreBandLabel}</Text>
+        <AppText variant="h3" style={styles.scoreTitle}>{t('healthReport.scoreTitle')}</AppText>
+        <AppText variant="h1" style={styles.scoreValue}>{report.healthScore}</AppText>
+        <AppText variant="body2" style={styles.scoreMax}>{t('healthReport.scoreOutOf')}</AppText>
+        <AppText variant="body" style={styles.scoreDescription}>{scoreBandLabel}</AppText>
       </LinearGradient>
     </Card>
   );
@@ -80,23 +87,23 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
   const renderOverviewCard = () => (
     <Card style={[styles.card, { backgroundColor: colors.card }]}>
       <Card.Content>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.overviewTitle')}</Text>
+        <AppText style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.overviewTitle')}</AppText>
         <View style={styles.statsGrid}>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.primary }]}>{report.totalRecords}</Text>
-            <Text style={[styles.statLabel, { color: colors.text }]}>{t('achievements.totalRecords')}</Text>
+            <AppText style={[styles.statValue, { color: colors.primary }]}>{report.totalRecords}</AppText>
+            <AppText style={[styles.statLabel, { color: colors.text }]}>{t('achievements.totalRecords')}</AppText>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.primary }]}>{report.averagePerDay.toFixed(1)}</Text>
-            <Text style={[styles.statLabel, { color: colors.text }]}>{t('healthReport.statAvgPerDay')}</Text>
+            <AppText style={[styles.statValue, { color: colors.primary }]}>{report.averagePerDay.toFixed(1)}</AppText>
+            <AppText style={[styles.statLabel, { color: colors.text }]}>{t('healthReport.statAvgPerDay')}</AppText>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.primary }]}>{report.averageSmoothLevel.toFixed(1)}</Text>
-            <Text style={[styles.statLabel, { color: colors.text }]}>{t('healthReport.statAvgSmooth')}</Text>
+            <AppText style={[styles.statValue, { color: colors.primary }]}>{report.averageSmoothLevel.toFixed(1)}</AppText>
+            <AppText style={[styles.statLabel, { color: colors.text }]}>{t('healthReport.statAvgSmooth')}</AppText>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.primary }]}>{report.averageGap.toFixed(1)}</Text>
-            <Text style={[styles.statLabel, { color: colors.text }]}>{t('healthReport.statAvgGap')}</Text>
+            <AppText style={[styles.statValue, { color: colors.primary }]}>{report.averageGap.toFixed(1)}</AppText>
+            <AppText style={[styles.statLabel, { color: colors.text }]}>{t('healthReport.statAvgGap')}</AppText>
           </View>
         </View>
       </Card.Content>
@@ -106,33 +113,33 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
   const renderRatingCard = () => (
     <Card style={[styles.card, { backgroundColor: colors.card }]}>
       <Card.Content>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.ratingTitle')}</Text>
+        <AppText style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.ratingTitle')}</AppText>
         <View style={styles.ratingsContainer}>
           <View style={styles.ratingItem}>
-            <Text style={[styles.ratingLabel, { color: colors.text }]}>{t('healthReport.labelConsistency')}</Text>
+            <AppText style={[styles.ratingLabel, { color: colors.text }]}>{t('healthReport.labelConsistency')}</AppText>
             <Chip
               style={[styles.ratingChip, { backgroundColor: HealthReportService.getRatingColor(report.consistency) }]}
               textStyle={styles.ratingChipText}
             >
-              {HealthReportService.getRatingText(report.consistency)}
+              {t(ratingI18nKey('regularity', report.consistency))}
             </Chip>
           </View>
           <View style={styles.ratingItem}>
-            <Text style={[styles.ratingLabel, { color: colors.text }]}>{t('healthReport.labelSmoothness')}</Text>
+            <AppText style={[styles.ratingLabel, { color: colors.text }]}>{t('healthReport.labelSmoothness')}</AppText>
             <Chip
               style={[styles.ratingChip, { backgroundColor: HealthReportService.getRatingColor(report.smoothness) }]}
               textStyle={styles.ratingChipText}
             >
-              {HealthReportService.getRatingText(report.smoothness)}
+              {t(ratingI18nKey('comfort', report.smoothness))}
             </Chip>
           </View>
           <View style={styles.ratingItem}>
-            <Text style={[styles.ratingLabel, { color: colors.text }]}>{t('healthReport.labelOverall')}</Text>
+            <AppText style={[styles.ratingLabel, { color: colors.text }]}>{t('healthReport.labelOverall')}</AppText>
             <Chip
               style={[styles.ratingChip, { backgroundColor: HealthReportService.getRatingColor(report.overallHealth) }]}
               textStyle={styles.ratingChipText}
             >
-              {HealthReportService.getRatingText(report.overallHealth)}
+              {t(ratingI18nKey('pattern', report.overallHealth))}
             </Chip>
           </View>
         </View>
@@ -143,17 +150,15 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
   const renderSmoothLevelDistribution = () => (
     <Card style={[styles.card, { backgroundColor: colors.card }]}>
       <Card.Content>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.distributionTitle')}</Text>
+        <AppText style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.distributionTitle')}</AppText>
         <View style={styles.distributionContainer}>
           {report.smoothLevelDistribution.map((item, index) => (
             <View key={index} style={styles.distributionItem}>
               <View style={styles.distributionHeader}>
-                <Text style={[styles.distributionEmoji, { color: smoothLevelColor[item.level] }]}>
-                  {smoothEmoji[item.level]}
-                </Text>
-                <Text style={[styles.distributionLabel, { color: colors.text }]}>
+                <View style={[styles.distributionDot, { backgroundColor: smoothLevelColor[item.level] }]} />
+                <AppText style={[styles.distributionLabel, { color: colors.text }]}>
                   {t(`smoothLevel.${smoothLevelI18nKey(item.level)}`)}
-                </Text>
+                </AppText>
               </View>
               <View style={styles.distributionBar}>
                 <View
@@ -166,12 +171,12 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
                   ]}
                 />
               </View>
-              <Text style={[styles.distributionValue, { color: colors.text }]}>
+              <AppText style={[styles.distributionValue, { color: colors.text }]}>
                 {t('healthReport.distCount', {
                   count: item.count,
                   pct: item.percentage.toFixed(1),
                 })}
-              </Text>
+              </AppText>
             </View>
           ))}
         </View>
@@ -182,11 +187,11 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
   const renderRecommendations = () => (
     <Card style={[styles.card, { backgroundColor: colors.card }]}>
       <Card.Content>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.recommendationsTitle')}</Text>
+        <AppText style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.recommendationsTitle')}</AppText>
         <View style={styles.recommendationsContainer}>
           {report.recommendations.map((recommendation, index) => (
             <View key={index} style={styles.recommendationItem}>
-              <Text style={[styles.recommendationText, { color: colors.text }]}>{recommendation}</Text>
+              <AppText style={[styles.recommendationText, { color: colors.text }]}>{recommendation}</AppText>
             </View>
           ))}
         </View>
@@ -197,11 +202,11 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
   const renderTrends = () => (
     <Card style={[styles.card, { backgroundColor: colors.card }]}>
       <Card.Content>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.trendsTitle')}</Text>
+        <AppText style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.trendsTitle')}</AppText>
         <View style={styles.trendsContainer}>
           {report.trends.map((trend, index) => (
             <View key={index} style={styles.trendItem}>
-              <Text style={[styles.trendText, { color: colors.text }]}>{trend}</Text>
+              <AppText style={[styles.trendText, { color: colors.text }]}>{trend}</AppText>
             </View>
           ))}
         </View>
@@ -215,13 +220,13 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
     return (
       <Card style={[styles.card, { backgroundColor: colors.card }]}>
         <Card.Content>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.timePatternTitle')}</Text>
+          <AppText style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.timePatternTitle')}</AppText>
           <View style={styles.timePatternContainer}>
             {report.timePattern.map((item, index) => (
               <View key={index} style={styles.timePatternItem}>
-                <Text style={[styles.timePatternHour, { color: colors.text }]}>
+                <AppText style={[styles.timePatternHour, { color: colors.text }]}>
                   {item.hour.toString().padStart(2, '0')}:00
-                </Text>
+                </AppText>
                 <View style={styles.timePatternBar}>
                   <View
                     style={[
@@ -233,9 +238,9 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
                     ]}
                   />
                 </View>
-                <Text style={[styles.timePatternCount, { color: colors.text }]}>
+                <AppText style={[styles.timePatternCount, { color: colors.text }]}>
                   {t('healthReport.hourCount', { count: item.count })}
-                </Text>
+                </AppText>
               </View>
             ))}
           </View>
@@ -247,10 +252,24 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Text style={[styles.reportTitle, { color: colors.text }]}>{t('healthReport.reportTitle')}</Text>
-        <Text style={[styles.reportPeriod, { color: colors.text, opacity: 0.7 }]}>{report.period}</Text>
+        <AppText style={[styles.reportTitle, { color: colors.text }]}>{t('healthReport.reportTitle')}</AppText>
+        <AppText style={[styles.reportPeriod, { color: colors.text, opacity: 0.7 }]}>{report.period}</AppText>
+        <AppText style={[styles.reportNote, { color: colors.text }]}>
+          {t('healthReport.basisNote')} {t('healthReport.reflectionNote')}
+        </AppText>
       </View>
 
+      {report.totalRecords === 0 ? (
+        <Card style={[styles.card, { backgroundColor: colors.card }]}>
+          <Card.Content>
+            <AppText style={[styles.cardTitle, { color: colors.text }]}>{t('healthReport.overviewTitle')}</AppText>
+            <AppText style={[styles.emptyReportText, { color: colors.text }]}>
+              {t('healthReport.emptyStart')}
+            </AppText>
+          </Card.Content>
+        </Card>
+      ) : (
+        <>
       {renderScoreCard()}
       {renderOverviewCard()}
       {renderRatingCard()}
@@ -258,6 +277,8 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
       {renderTimePattern()}
       {report.trends.length > 0 && renderTrends()}
       {report.recommendations.length > 0 && renderRecommendations()}
+        </>
+      )}
 
       {onClose && (
         <View style={styles.buttonContainer}>
@@ -278,11 +299,11 @@ export default function HealthReportComponent({ report, onClose }: HealthReportP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: theme.spacing.md,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: theme.spacing.md,
   },
   reportTitle: {
     fontSize: 24,
@@ -292,13 +313,23 @@ const styles = StyleSheet.create({
   reportPeriod: {
     fontSize: 16,
   },
+  reportNote: {
+    ...theme.typography.caption,
+    opacity: 0.65,
+    textAlign: 'center',
+    marginTop: theme.spacing.xs,
+  },
+  emptyReportText: {
+    ...theme.typography.body,
+    lineHeight: 22,
+  },
   scoreCard: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
     borderRadius: 16,
     overflow: 'hidden',
   },
   scoreGradient: {
-    padding: 24,
+    padding: theme.spacing.lg,
     alignItems: 'center',
   },
   scoreTitle: {
@@ -323,14 +354,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   card: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
     borderRadius: 16,
     elevation: 3,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -340,7 +371,7 @@ const styles = StyleSheet.create({
   statItem: {
     width: '48%',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   statValue: {
     fontSize: 24,
@@ -352,7 +383,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   ratingsContainer: {
-    gap: 12,
+    gap: theme.spacing.sm,
   },
   ratingItem: {
     flexDirection: 'row',
@@ -372,7 +403,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   distributionContainer: {
-    gap: 12,
+    gap: theme.spacing.sm,
   },
   distributionItem: {
     marginBottom: 8,
@@ -382,9 +413,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
-  distributionEmoji: {
-    fontSize: 16,
-    marginRight: 8,
+  distributionDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: theme.spacing.sm,
   },
   distributionLabel: {
     fontSize: 14,
@@ -392,7 +425,7 @@ const styles = StyleSheet.create({
   },
   distributionBar: {
     height: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: theme.colors.surfaceVariant,
     borderRadius: 4,
     marginBottom: 4,
   },
@@ -405,7 +438,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   recommendationsContainer: {
-    gap: 8,
+    gap: theme.spacing.xs,
   },
   recommendationItem: {
     paddingVertical: 4,
@@ -415,7 +448,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   trendsContainer: {
-    gap: 8,
+    gap: theme.spacing.xs,
   },
   trendItem: {
     paddingVertical: 4,
@@ -425,7 +458,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   timePatternContainer: {
-    gap: 8,
+    gap: theme.spacing.xs,
   },
   timePatternItem: {
     flexDirection: 'row',
@@ -440,9 +473,9 @@ const styles = StyleSheet.create({
   timePatternBar: {
     flex: 1,
     height: 6,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: theme.colors.surfaceVariant,
     borderRadius: 3,
-    marginHorizontal: 8,
+    marginHorizontal: theme.spacing.sm,
   },
   timePatternBarFill: {
     height: '100%',
@@ -454,8 +487,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   buttonContainer: {
-    marginTop: 20,
-    marginBottom: 32,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
   },
   closeButton: {
     borderRadius: 12,

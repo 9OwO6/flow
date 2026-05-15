@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import theme from '@/constants/DesignTokens';
 import { WaterService } from '@/utils/waterService';
 import { StorageService } from '@/utils/storage';
@@ -73,9 +73,9 @@ export default function WaterTracker({ onUpdate }: WaterTrackerProps) {
             ]} 
           />
         </View>
-        <Text style={styles.progressText}>
+        <AppText style={styles.progressText}>
           {waterStats.totalAmount}ml / {waterStats.goal}ml ({percentage}%)
-        </Text>
+        </AppText>
       </View>
 
       {/* 快捷按钮 */}
@@ -86,7 +86,7 @@ export default function WaterTracker({ onUpdate }: WaterTrackerProps) {
           disabled={loading}
         >
           <FontAwesome name="tint" size={theme.iconSize.md} color={theme.colors.primary} />
-          <Text style={styles.buttonText}>+250ml</Text>
+          <AppText style={styles.buttonText}>+250ml</AppText>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -95,7 +95,7 @@ export default function WaterTracker({ onUpdate }: WaterTrackerProps) {
           disabled={loading}
         >
           <FontAwesome name="tint" size={theme.iconSize.lg} color={theme.colors.primary} />
-          <Text style={styles.buttonText}>+500ml</Text>
+          <AppText style={styles.buttonText}>+500ml</AppText>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -104,7 +104,7 @@ export default function WaterTracker({ onUpdate }: WaterTrackerProps) {
           disabled={loading}
         >
           <FontAwesome name="tint" size={theme.iconSize.xl} color={theme.colors.primary} />
-          <Text style={styles.buttonText}>+750ml</Text>
+          <AppText style={styles.buttonText}>+750ml</AppText>
         </TouchableOpacity>
       </View>
     </ModernCard>

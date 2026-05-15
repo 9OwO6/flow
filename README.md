@@ -1,31 +1,49 @@
-# Flow
+# Flow / La-le-mo
 
-A privacy-conscious mobile health tracking app for logging bowel patterns, hydration, symptoms, and wellness trends with weekly and monthly reports.
+A local-first personal pattern tracker for bowel habits, hydration, and wellness notes.
 
-Flow is designed as a practical mobile app that helps users turn simple daily records into meaningful health patterns. The app focuses on fast logging, local-first data handling, wellness summaries, hydration reminders, and exportable records.
-
-> **Note:** This project is for personal health tracking and portfolio demonstration. It is not a medical diagnosis tool.
+Flow is designed for private day-to-day reflection, not diagnosis. It helps a person save quick entries, notice comfort and regularity patterns over time, and export their own data when they want a backup or a shareable summary.
 
 ---
 
-## Overview
+## Product Problem
 
-Flow helps users track body flow patterns in a simple, private, and structured way.
+Digestive and hydration patterns are easy to forget, awkward to discuss, and often too personal for cloud-first products. Flow explores how a sensitive wellness tracker can feel calm, fast, and trustworthy without pretending to provide medical answers.
 
-The app supports:
+---
 
-- quick daily record logging
-- hydration tracking
-- weekly and monthly reports
-- health score summaries
-- comfort and regularity analysis
-- time-pattern review
-- wellness tips
-- data export
-- reminder settings
-- bilingual interface support
+## Target Users
 
-The goal of this project was to build a complete mobile product experience rather than a single-screen demo.
+- People who want a private log of bowel movements and hydration.
+- People trying to notice personal routine patterns around comfort, timing, water, food notes, or movement.
+- People who want exportable records for their own reflection or for a conversation with a professional.
+
+---
+
+## Core Flows
+
+- **Quick log**: save a bowel habit entry with a comfort level in a few taps.
+- **Detailed entry**: add optional notes, food tags, and movement context.
+- **Hydration tracking**: quickly log common water amounts and set gentle reminders.
+- **History**: review weekly, monthly, and yearly patterns.
+- **Pattern summaries**: view simple summaries based only on saved entries.
+- **Export and sharing**: export CSV/JSON data or create an optional 7-day summary card.
+
+---
+
+## Privacy-First Design Decisions
+
+- Records are stored on device using local storage.
+- There is no Flow account or sync server in this project.
+- Export and sharing are explicit user actions.
+- Privacy and non-medical disclaimer screens are available in Settings.
+- Clearing app data or uninstalling may delete local records, so export is available for backup.
+
+---
+
+## Non-Medical Disclaimer
+
+Flow is a personal tracking and reflection tool. It is not a medical device and does not diagnose, treat, or prevent disease. Pattern summaries are based only on saved entries and should not be treated as medical advice. If symptoms or concerns come up, users should consider speaking with a qualified healthcare professional.
 
 ---
 
@@ -48,39 +66,39 @@ The Android APK is available through the **Releases** section of this repository
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="./assets/showcase/flow-home.jpg" width="260" alt="Flow home screen" />
+      <img src="./showcase/flow-home.jpg" width="260" alt="Flow home screen" />
       <br />
-      <b>Home & Hydration</b>
+      <b>Home & Daily Status</b>
       <br />
-      Quick access to daily tracking, water intake, and recent frequency.
+      Quick access to daily logging, hydration, and recent pattern status.
     </td>
     <td align="center" width="50%">
-      <img src="./assets/showcase/flow-dashboard.jpg" width="260" alt="Flow dashboard screen" />
+      <img src="./showcase/flow-dashboard.jpg" width="260" alt="Flow daily overview screen" />
       <br />
-      <b>Health Dashboard</b>
+      <b>Daily Overview</b>
       <br />
-      Overview of today's records, total records, and health score.
+      A calm snapshot of saved entries, hydration, and recent activity.
     </td>
   </tr>
 </table>
 
-### Reports & Insights
+### Pattern Summaries & Insights
 
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="./assets/showcase/flow-weekly-report.jpg" width="260" alt="Flow weekly report screen" />
+      <img src="./showcase/flow-weekly-report.jpg" width="260" alt="Flow weekly pattern summary screen" />
       <br />
-      <b>Weekly Report</b>
+      <b>Weekly Pattern Summary</b>
       <br />
-      Health score, summary metrics, and comfort-based ratings.
+      Personal pattern reflection based only on saved entries.
     </td>
     <td align="center" width="50%">
-      <img src="./assets/showcase/flow-tips.jpg" width="260" alt="Flow tips screen" />
+      <img src="./showcase/flow-tips.jpg" width="260" alt="Flow pattern notes screen" />
       <br />
-      <b>Trends & Tips</b>
+      <b>Pattern Notes</b>
       <br />
-      Time pattern analysis, trend notes, and practical wellness tips.
+      Gentle, non-diagnostic notes for personal reflection.
     </td>
   </tr>
 </table>
@@ -90,32 +108,32 @@ The Android APK is available through the **Releases** section of this repository
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="./assets/showcase/flow-history-week.jpg" width="260" alt="Flow weekly history screen" />
+      <img src="./showcase/flow-history-week.jpg" width="260" alt="Flow weekly history screen" />
       <br />
       <b>Weekly History</b>
       <br />
-      Review weekly records and search previous logs.
+      Review recent entries and saved patterns.
     </td>
     <td align="center" width="50%">
-      <img src="./assets/showcase/flow-history-year.jpg" width="260" alt="Flow yearly history screen" />
+      <img src="./showcase/flow-history-year.jpg" width="260" alt="Flow yearly history screen" />
       <br />
-      <b>Yearly Statistics</b>
+      <b>Yearly View</b>
       <br />
-      View long-term monthly patterns and frequency summaries.
+      View longer-term monthly patterns and frequency summaries.
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="./assets/showcase/flow-settings.jpg" width="260" alt="Flow settings screen" />
+      <img src="./showcase/flow-settings.jpg" width="260" alt="Flow settings screen" />
       <br />
       <b>Settings</b>
       <br />
-      Language, theme, reminders, quiet hours, and feedback settings.
+      Language, reminders, feedback, and privacy-related controls.
     </td>
     <td align="center" width="50%">
-      <img src="./assets/showcase/flow-data-export.jpg" width="260" alt="Flow data management screen" />
+      <img src="./showcase/flow-data-export.jpg" width="260" alt="Flow data export screen" />
       <br />
-      <b>Data Management</b>
+      <b>Trust & Data</b>
       <br />
       Export records as CSV / JSON and manage local app data.
     </td>
@@ -124,133 +142,118 @@ The Android APK is available through the **Releases** section of this repository
 
 ---
 
+## Portfolio Highlights
+
+- Sensitive-topic product framing with careful, non-diagnostic language.
+- Local-first trust model for private wellness data.
+- Fast daily logging loop with optional richer context.
+- Pattern summaries and export flows without cloud dependency.
+- Bilingual UI foundation with English and Chinese resources.
+- Expo / React Native implementation with a reusable design-token layer.
+- Iterative product polish from prototype-style interactions to calmer V2 mobile UX.
+
+---
+
 ## Key Features
 
 ### Record Tracking
 
-- Log daily bowel movement records
-- Track comfort level and timing
-- Review recent frequency
-- Search historical records
-- Organize records by week, month, and year
+- Log daily bowel movement records.
+- Track comfort level and timing.
+- Add optional notes, food tags, and movement context.
+- Search and review historical records.
+- Organize records by week, month, and year.
 
-### Health Reports
+### Pattern Summaries
 
-- Weekly report summary
-- Monthly health analysis
-- Health score overview
-- Regularity rating
-- Comfort distribution
-- Time pattern analysis
-- Simple wellness tips based on recorded data
+- Weekly and monthly pattern summaries.
+- Regularity and comfort trend reflection.
+- Distribution summaries based only on saved entries.
+- Empty states that avoid unsupported scoring when there is not enough data.
+- Non-diagnostic wording for privacy-sensitive personal tracking.
 
 ### Hydration Tracking
 
-- Daily water intake goal
-- Quick add buttons for common water amounts
-- Visual progress tracking
-- Hydration reminder settings
+- Daily water intake goal.
+- Quick add buttons for common water amounts.
+- Visual progress tracking.
+- Gentle hydration reminder settings.
 
-### Settings & Personalization
+### Settings & Data Controls
 
-- English / Chinese language option
-- System-based theme behavior
-- Hydration reminders
-- Quiet hours
-- Haptics and motion feedback
-- Success sound settings
-
-### Data Management
-
-- Export data as CSV
-- Export data as JSON
-- Clear local data
-- Local-first privacy mindset
+- English / Chinese language option.
+- Hydration reminders and quiet hours.
+- Haptics, motion feedback, celebration settings, and custom success sounds.
+- CSV / JSON export.
+- Clear local data.
+- Privacy and non-medical disclaimer screens.
 
 ---
 
 ## Tech Stack
 
-- **Framework:** React Native / Expo
-- **Language:** TypeScript
-- **Navigation:** Expo Router / React Navigation
-- **Storage:** Local device storage
-- **Notifications:** Reminder and quiet-hour logic
-- **UI:** Mobile-first custom UI components
-- **Platform:** Android APK build
+- Expo SDK 54
+- React Native 0.81
+- React 19
+- TypeScript
+- Expo Router
+- React Native Paper
+- i18next / react-i18next
+- AsyncStorage
+- Expo Notifications
+- Expo File System
+- Expo Sharing
+- Expo AV
+- Expo Document Picker
 
-> Tech stack may be updated as the project evolves.
+---
+
+## Getting Started
+
+```bash
+npm install
+npm run start
+```
+
+### Common Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run start` | Start Expo dev tools |
+| `npm run start:go` | Start for Expo Go |
+| `npm run android` | Run Android development build |
+| `npm run ios` | Run iOS development build |
+| `npm run web` | Run web preview |
+| `npm test` | Jest watch mode |
+
+### Build Notes
+
+Native permission changes, such as microphone access for custom success sounds, require a new native build. EAS configuration is present in `app.json` / `eas.json`; signing assets should remain local and gitignored.
 
 ---
 
 ## Documentation
 
-- [Build Notes](./docs/build.md) — Android APK build and release workflow
-- [Design Notes](./docs/design.md) — product positioning, brand direction, and UI principles
-- [Troubleshooting Notes](./docs/troubleshooting.md) — Expo Go and EAS build troubleshooting
+- **Build Notes**: Android APK build and release workflow.
+- **Design Notes**: product positioning, brand direction, and UI principles.
+- **Troubleshooting Notes**: Expo Go and EAS build troubleshooting.
+
+These notes can live in dedicated documentation files as the project grows. The README keeps the public portfolio narrative concise.
 
 ---
 
 ## Product Goals
 
-Flow was built to practice mobile product thinking through a real-world personal health tracking use case.
+Flow was built to practice mobile product thinking through a privacy-sensitive personal tracking use case.
 
-The main goals were:
+The main goals were to:
 
-- design a simple and calm mobile interface
-- turn raw daily records into useful summaries
-- build a multi-screen mobile app experience
-- support local-first health data handling
-- add practical settings, reminders, and export features
-- make the app useful beyond a basic CRUD demo
-
----
-
-## UX / UI Direction
-
-The interface uses a soft, calm, health-oriented visual style.
-
-Design priorities:
-
-- large readable text
-- rounded cards
-- low-friction daily input
-- soft green accent color
-- clear report sections
-- simple navigation
-- mobile-friendly spacing
-- gentle feedback instead of overwhelming charts
-
-The app intentionally avoids a clinical or overly complex medical interface. The goal is to make private health tracking feel approachable and manageable.
-
----
-
-## Privacy & Disclaimer
-
-Flow is designed with a privacy-first mindset.
-
-Health-related records should remain user-controlled. The project emphasizes:
-
-- local-first data handling
-- transparent export options
-- no unnecessary account system
-- no public sharing by default
-
-This app is not intended to diagnose, treat, or replace professional medical advice. If users experience persistent discomfort, pain, unusual symptoms, or major changes in bowel habits, they should consult a qualified healthcare professional.
-
----
-
-## What I Learned
-
-Through this project, I practiced:
-
-- mobile app structure and navigation
-- user-centered health tracking workflows
-- data summary and report design
-- local data management
-- settings and reminder UX
-- building a complete app experience from idea to APK
-- balancing sensitive health-related content with respectful product design
+- Design a simple and calm mobile interface.
+- Turn daily records into useful personal summaries.
+- Build a multi-screen mobile app experience.
+- Support local-first data handling.
+- Add practical settings, reminders, and export features.
+- Make the app useful beyond a basic CRUD demo.
 
 ---
 
@@ -258,37 +261,37 @@ Through this project, I practiced:
 
 Planned or possible improvements:
 
-- better chart visualizations
-- improved accessibility and contrast
-- more detailed trend analysis
-- customizable health goals
-- stronger bilingual copy polish
-- encrypted local data storage
-- backup / restore support
-- iOS TestFlight build
-- smoother onboarding flow
+- Better chart visualizations.
+- Improved accessibility and contrast.
+- Stronger bilingual copy polish.
+- Encrypted local data storage.
+- Backup / restore support.
+- iOS TestFlight build.
+- Smoother onboarding flow.
+- Additional manual QA on real devices.
 
 ---
 
 ## Project Status
 
-Current status: **MVP / portfolio showcase**
+Current status: V2 portfolio showcase.
 
-The app has core tracking, reporting, settings, and data-management functionality. It is suitable as a mobile product showcase and may continue to evolve with additional polish.
+The app has core tracking, pattern summaries, history views, settings, and data-management functionality. It is suitable as a mobile product showcase and may continue to evolve with additional polish.
 
 ---
 
 ## Author
 
-**Leo Wang**  
+Leo Wang  
 CS graduate based in Richmond, BC, Canada.
 
 - GitHub: [9OwO6](https://github.com/9OwO6)
-- LinkedIn: [Yanghuijing Wang](https://www.linkedin.com/in/yanghuijing-wang-01459b291/)
+- LinkedIn: Yanghuijing Wang
 
 ---
 
 ## License
 
-This project is currently maintained as a personal portfolio project.  
+This project is currently maintained as a personal portfolio project.
+
 License information can be updated later if the project is prepared for public reuse.

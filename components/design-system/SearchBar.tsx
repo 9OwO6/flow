@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    elevation: 0,
     ...theme.elevation.sm,
   },
   input: {

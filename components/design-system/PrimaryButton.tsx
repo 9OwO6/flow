@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
-import { StyleSheet, TouchableOpacity, Animated, View, Text, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, TouchableOpacity, Animated, View, type StyleProp, type ViewStyle } from 'react-native';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 import { useReduceMotion } from '@/hooks/useReduceMotion';
 import { delight } from '@/utils/delight';
 import { runPressScale } from '@/utils/delight/motionTemplates';
@@ -80,10 +81,6 @@ export default function PrimaryButton({
     ? [styles.button, styles.filled, sizeStyle, { backgroundColor: theme.colors.primary }]
     : [styles.button, styles.outlined, sizeStyle, { borderColor: theme.colors.primary }];
 
-  const textStyle = variant === 'filled'
-    ? styles.filledText
-    : styles.outlinedText;
-
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
@@ -107,9 +104,9 @@ export default function PrimaryButton({
               style={styles.icon} 
             />
           )}
-          <Text style={[styles.text, textStyle]}>
+          <AppText variant="button" color={variant === 'filled' ? 'onPrimary' : 'primary'}>
             {loading ? '...' : title}
-          </Text>
+          </AppText>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -156,14 +153,5 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: theme.iconSize.md,
     marginRight: theme.spacing.sm,
-  },
-  text: {
-    ...theme.typography.button,
-  },
-  filledText: {
-    color: theme.colors.textOnPrimary,
-  },
-  outlinedText: {
-    color: theme.colors.primary,
   },
 });

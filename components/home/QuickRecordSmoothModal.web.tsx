@@ -10,7 +10,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import { useTranslation } from 'react-i18next';
 import theme from '@/constants/DesignTokens';
 import PrimaryButton from '@/components/design-system/PrimaryButton';
@@ -19,7 +19,7 @@ import {
   LEVEL_ORDER,
   DEFAULT_PAGE,
   smoothKey,
-  levelEmoji,
+  smoothLevelFill,
   smoothModalStyles as styles,
   type QuickRecordSmoothModalProps,
 } from '@/components/home/quickRecordSmoothShared';
@@ -85,8 +85,12 @@ export default function QuickRecordSmoothModal({ visible, onClose, onConfirm }: 
       <View style={styles.backdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityRole="button" />
         <View style={[styles.sheet, { width: sheetWidth }]}>
-          <Text style={styles.title}>{t('quickRecord.pickComfortTitle')}</Text>
-          <Text style={styles.hint}>{t('quickRecord.pickComfortHint')}</Text>
+          <AppText variant="h3" style={styles.title}>
+            {t('quickRecord.pickComfortTitle')}
+          </AppText>
+          <AppText variant="caption" color="secondary" style={styles.hint}>
+            {t('quickRecord.pickComfortHint')}
+          </AppText>
 
           <ScrollView
             ref={scrollRef}
@@ -108,8 +112,10 @@ export default function QuickRecordSmoothModal({ visible, onClose, onConfirm }: 
                     },
                   ]}
                 >
-                  <Text style={styles.emoji}>{levelEmoji(lv)}</Text>
-                  <Text style={styles.levelLabel}>{t(`smoothLevel.${smoothKey(lv)}`)}</Text>
+                  <View style={[styles.levelDot, { backgroundColor: smoothLevelFill(lv) }]} />
+                  <AppText variant="h3" style={styles.levelLabel}>
+                    {t(`smoothLevel.${smoothKey(lv)}`)}
+                  </AppText>
                 </Animated.View>
               </View>
             ))}

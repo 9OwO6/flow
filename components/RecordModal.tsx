@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Alert, Animated, ScrollView, TouchableOpacity } from 'react-native';
-import { Modal, Portal, Text, Chip, TextInput, IconButton } from 'react-native-paper';
+import { StyleSheet, View, Animated, ScrollView, TouchableOpacity } from 'react-native';
+import { Modal, Portal, TextInput, IconButton } from 'react-native-paper';
 import { StorageService } from '@/utils/storage';
 import { PoopRecord, SmoothLevel, DietTag, ExerciseLevel } from '@/types';
 import { delight } from '@/utils/delight';
 import { getMinutesUntilNewRecordAllowed } from '@/utils/recordMinInterval';
-import Colors from '@/constants/Colors';
 import theme from '@/constants/DesignTokens';
-import { useColorScheme } from '@/components/useColorScheme';
 import { useTranslation } from 'react-i18next';
 import PrimaryButton from '@/components/design-system/PrimaryButton';
 import ModernCard from '@/components/design-system/ModernCard';
+import AppText from '@/components/design-system/AppText';
+import AppSnackbar from '@/components/design-system/AppSnackbar';
+import { AppAlertDialog } from '@/components/design-system/AppConfirmDialog';
 import { createFadeInAnimation, createSlideInAnimation } from '@/utils/animations';
 import type { RecordSaveCelebrationMeta } from '@/contexts/CelebrationContext';
 
@@ -18,7 +19,7 @@ interface RecordModalProps {
   visible: boolean;
   onClose: () => void;
   onSave: (meta: RecordSaveCelebrationMeta) => void;
-  editingRecord?: PoopRecord | null; // 新增：要编辑的记录
+  editingRecord?: PoopRecord | null;
 }
 
 const getSmoothLevelOptions = (t: any) => [
@@ -36,16 +37,16 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
   const [dietTags, setDietTags] = useState<DietTag[]>([]);
   const [exerciseLevel, setExerciseLevel] = useState<ExerciseLevel>(ExerciseLevel.NONE);
   const [loading, setLoading] = useState(false);
-  
-  // 动画状态
+
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
+  const [intervalDialog, setIntervalDialog] = useState({ visible: false, minutes: 0 });
+  const [saveErrorVisible, setSaveErrorVisible] = useState(false);
+
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(100));
 
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
   const designColors = theme.colors;
 
-  // 当编辑记录改变时，更新表单
   useEffect(() => {
     if (editingRecord) {
       setSmoothLevel(editingRecord.smoothLevel);
@@ -53,7 +54,6 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
       setDietTags(editingRecord.dietTags || []);
       setExerciseLevel(editingRecord.exerciseLevel || ExerciseLevel.NONE);
     } else {
-      // 新建记录时重置表单
       setSmoothLevel(SmoothLevel.NORMAL);
       setNotes('');
       setDietTags([]);
@@ -61,16 +61,13 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
     }
   }, [editingRecord]);
 
-  // 模态框动画
   useEffect(() => {
     if (visible) {
-      // 显示动画
       Animated.parallel([
         createFadeInAnimation(fadeAnim, 300),
         createSlideInAnimation(slideAnim, 100, 300),
       ]).start();
     } else {
-      // 隐藏动画
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
@@ -87,8 +84,8 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
   }, [visible]);
 
   const handleSave = async () => {
-    if (loading) return; // Prevent double submission
-    
+    if (loading) return;
+
     try {
       setLoading(true);
       const snapshot = await StorageService.getAllRecords();
@@ -97,7 +94,6 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
       const totalCountBefore = snapshot.length;
 
       if (editingRecord) {
-        // Update existing record
         const updatedRecord: PoopRecord = {
           ...editingRecord,
           smoothLevel,
@@ -105,23 +101,21 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
           dietTags: dietTags.length > 0 ? dietTags : undefined,
           exerciseLevel: exerciseLevel !== ExerciseLevel.NONE ? exerciseLevel : undefined,
         };
-        
-        // Delete old record and add updated one
+
         await StorageService.deleteRecord(editingRecord.id);
         await StorageService.addRecord(updatedRecord);
-        
-        Alert.alert(t('history.updateSuccess'), t('history.updateMessage'));
+
+        setSnackbar({
+          visible: true,
+          message: `${t('history.updateSuccess')}: ${t('history.updateMessage')}`,
+        });
       } else {
         const waitMin = getMinutesUntilNewRecordAllowed(snapshot);
         if (waitMin > 0) {
-          Alert.alert(
-            t('home.recordIntervalTitle'),
-            t('home.recordIntervalMessage', { minutes: waitMin })
-          );
+          setIntervalDialog({ visible: true, minutes: waitMin });
           return;
         }
 
-        // Create new record
         const now = new Date();
         const record: PoopRecord = {
           id: `poop_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -138,9 +132,7 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
         await StorageService.addRecord(record);
       }
 
-      // Close modal and trigger save callback
       onClose();
-      // Use setTimeout to ensure modal closes before callback
       const celebrationMeta: RecordSaveCelebrationMeta = {
         isNewRecord: !editingRecord,
         todayCountBefore,
@@ -152,14 +144,14 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
     } catch (error) {
       console.error('Error saving record:', error);
       void delight.play('warning');
-      Alert.alert(t('common.error'), t('recordModal.saveError'));
+      setSaveErrorVisible(true);
     } finally {
       setLoading(false);
     }
   };
 
   const handleClose = () => {
-    if (loading) return; // Prevent closing while saving
+    if (loading) return;
     void delight.play('tap');
     onClose();
   };
@@ -174,15 +166,15 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
 
   const getTimeInfo = () => {
     if (editingRecord) {
-      return t('recordModal.timeInfo', { 
-        date: editingRecord.date, 
-        time: editingRecord.time 
+      return t('recordModal.timeInfo', {
+        date: editingRecord.date,
+        time: editingRecord.time,
       });
     }
     const now = new Date();
-    return t('recordModal.timeInfo', { 
-      date: now.toISOString().split('T')[0], 
-      time: now.toTimeString().slice(0, 5) 
+    return t('recordModal.timeInfo', {
+      date: now.toISOString().split('T')[0],
+      time: now.toTimeString().slice(0, 5),
     });
   };
 
@@ -196,11 +188,10 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
           <ModernCard style={styles.card} elevation="lg" padding="lg">
             <ScrollView showsVerticalScrollIndicator={false}>
-              {/* 标题 */}
               <View style={styles.header}>
-                <Text style={styles.title}>
+                <AppText variant="h3" style={styles.title}>
                   {getModalTitle()}
-                </Text>
+                </AppText>
                 <IconButton
                   icon="close"
                   iconColor={designColors.textPrimary}
@@ -209,17 +200,20 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
                 />
               </View>
 
-              {/* 时间信息 */}
-              <ModernCard style={styles.timeInfo} elevation="none" padding="md">
-                <Text style={styles.timeText}>
+              <ModernCard
+                style={[styles.timeInfo, { marginBottom: theme.spacing.md }]}
+                elevation="none"
+                padding="md"
+                backgroundColor={theme.colors.surfaceVariant}
+              >
+                <AppText variant="body2" color="secondary" style={styles.timeText}>
                   {getTimeInfo()}
-                </Text>
+                </AppText>
               </ModernCard>
 
-              {/* 顺畅度选择 */}
-              <Text style={styles.sectionTitle}>
+              <AppText variant="h3" style={styles.sectionTitle}>
                 {t('recordModal.feelingQuestion')}
-              </Text>
+              </AppText>
               <View style={styles.chipContainer}>
                 {getSmoothLevelOptions(t).map((option) => (
                   <TouchableOpacity
@@ -227,26 +221,26 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
                     onPress={() => setSmoothLevel(option.level)}
                     style={[
                       styles.chip,
-                      smoothLevel === option.level && { 
+                      smoothLevel === option.level && {
                         backgroundColor: option.color,
                         borderColor: option.color,
-                      }
+                      },
                     ]}
                   >
-                    <Text style={[
-                      styles.chipText,
-                      smoothLevel === option.level && styles.chipTextSelected
-                    ]}>
+                    <AppText
+                      variant="body2"
+                      color={smoothLevel === option.level ? 'onPrimary' : 'primary'}
+                      style={smoothLevel === option.level ? styles.chipTextSelected : undefined}
+                    >
                       {option.label}
-                    </Text>
+                    </AppText>
                   </TouchableOpacity>
                 ))}
               </View>
 
-              {/* 饮食标签 */}
-              <Text style={styles.sectionTitle}>
+              <AppText variant="h3" style={styles.sectionTitle}>
                 {t('recordModal.dietTags', 'Diet Tags (Optional)')}
-              </Text>
+              </AppText>
               <View style={styles.chipContainer}>
                 {[
                   { tag: DietTag.HIGH_FIBER, label: t('diet.highFiber', 'High Fiber') },
@@ -262,7 +256,7 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
                       key={tag}
                       onPress={() => {
                         if (isSelected) {
-                          setDietTags(dietTags.filter(t => t !== tag));
+                          setDietTags(dietTags.filter((x) => x !== tag));
                         } else {
                           setDietTags([...dietTags, tag]);
                         }
@@ -272,24 +266,24 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
                         isSelected && {
                           backgroundColor: designColors.primary,
                           borderColor: designColors.primary,
-                        }
+                        },
                       ]}
                     >
-                      <Text style={[
-                        styles.chipText,
-                        isSelected && styles.chipTextSelected
-                      ]}>
+                      <AppText
+                        variant="body2"
+                        color={isSelected ? 'onPrimary' : 'primary'}
+                        style={isSelected ? styles.chipTextSelected : undefined}
+                      >
                         {label}
-                      </Text>
+                      </AppText>
                     </TouchableOpacity>
                   );
                 })}
               </View>
 
-              {/* 运动强度 */}
-              <Text style={styles.sectionTitle}>
+              <AppText variant="h3" style={styles.sectionTitle}>
                 {t('recordModal.exercise', 'Exercise (Optional)')}
-              </Text>
+              </AppText>
               <View style={styles.chipContainer}>
                 {[
                   { level: ExerciseLevel.NONE, label: t('exercise.none', 'None') },
@@ -305,23 +299,23 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
                       exerciseLevel === level && {
                         backgroundColor: designColors.secondary,
                         borderColor: designColors.secondary,
-                      }
+                      },
                     ]}
                   >
-                    <Text style={[
-                      styles.chipText,
-                      exerciseLevel === level && styles.chipTextSelected
-                    ]}>
+                    <AppText
+                      variant="body2"
+                      color={exerciseLevel === level ? 'onPrimary' : 'primary'}
+                      style={exerciseLevel === level ? styles.chipTextSelected : undefined}
+                    >
                       {label}
-                    </Text>
+                    </AppText>
                   </TouchableOpacity>
                 ))}
               </View>
 
-              {/* 备注输入 */}
-              <Text style={styles.sectionTitle}>
+              <AppText variant="h3" style={styles.sectionTitle}>
                 {t('recordModal.notesLabel')}
-              </Text>
+              </AppText>
               <TextInput
                 value={notes}
                 onChangeText={setNotes}
@@ -335,7 +329,6 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
                 activeUnderlineColor="transparent"
               />
 
-              {/* 按钮 */}
               <View style={styles.buttonContainer}>
                 <PrimaryButton
                   title={t('common.cancel')}
@@ -357,6 +350,26 @@ export default function RecordModal({ visible, onClose, onSave, editingRecord }:
           </ModernCard>
         </Animated.View>
       </Modal>
+
+      <AppSnackbar
+        visible={snackbar.visible}
+        message={snackbar.message}
+        onDismiss={() => setSnackbar({ visible: false, message: '' })}
+      />
+      <AppAlertDialog
+        visible={intervalDialog.visible}
+        title={t('home.recordIntervalTitle')}
+        message={t('home.recordIntervalMessage', { minutes: intervalDialog.minutes })}
+        buttonLabel={t('common.confirm')}
+        onDismiss={() => setIntervalDialog({ visible: false, minutes: 0 })}
+      />
+      <AppAlertDialog
+        visible={saveErrorVisible}
+        title={t('common.error')}
+        message={t('recordModal.saveError')}
+        buttonLabel={t('common.confirm')}
+        onDismiss={() => setSaveErrorVisible(false)}
+      />
     </Portal>
   );
 }
@@ -369,6 +382,7 @@ const styles = StyleSheet.create({
   },
   card: {
     maxHeight: '100%',
+    marginBottom: 0,
   },
   header: {
     flexDirection: 'row',
@@ -377,22 +391,13 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   title: {
-    ...theme.typography.h3,
-    color: theme.colors.textPrimary,
     flex: 1,
   },
-  timeInfo: {
-    marginBottom: theme.spacing.md,
-    backgroundColor: theme.colors.surfaceVariant,
-  },
+  timeInfo: {},
   timeText: {
-    ...theme.typography.body2,
-    color: theme.colors.textSecondary,
     textAlign: 'center',
   },
   sectionTitle: {
-    ...theme.typography.h3,
-    color: theme.colors.textPrimary,
     marginBottom: theme.spacing.md,
     marginTop: theme.spacing.md,
   },
@@ -413,12 +418,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  chipText: {
-    ...theme.typography.body2,
-    color: theme.colors.textPrimary,
-  },
   chipTextSelected: {
-    color: theme.colors.textOnPrimary,
     fontWeight: '600',
   },
   textInput: {
@@ -433,4 +433,4 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
     marginTop: theme.spacing.md,
   },
-}); 
+});

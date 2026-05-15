@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useCallback } from 'react';
-import { Animated, StyleSheet, Text, View, Easing } from 'react-native';
+import { Animated, StyleSheet, View, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 
 /** `auto` → minimal unless `autoConfetti` is true (resolved before paint). */
 export type SuccessCelebrationVariant = 'minimal' | 'confetti' | 'auto';
@@ -224,7 +225,9 @@ export default function SuccessCelebration({
         )}
 
         <Animated.View style={[styles.toastPill, { opacity: toastOp }]}>
-          <Text style={styles.toastText}>{message}</Text>
+          <AppText variant="body2" style={styles.toastText}>
+            {message}
+          </AppText>
         </Animated.View>
       </View>
     </View>

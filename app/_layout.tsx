@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { PaperProvider } from 'react-native-paper';
 
+import { flowPaperLightTheme } from '@/constants/paperTheme';
 import { useColorScheme } from '@/components/useColorScheme';
 // Import i18n to ensure it's initialized
 import '@/utils/i18n';
@@ -48,7 +49,7 @@ export default function RootLayout() {
     if (loaded) {
       // Hide splash screen after fonts load
       SplashScreen.hideAsync().catch(err => {
-        console.log('Splash screen hide error:', err);
+        if (__DEV__) console.log('Splash screen hide error:', err);
       });
       setShowApp(true);
     } else {
@@ -85,13 +86,14 @@ function RootLayoutNav() {
   }, []);
 
   return (
-    <PaperProvider>
+    <PaperProvider theme={flowPaperLightTheme}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <CelebrationProvider>
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="onboarding" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="playground" options={{ title: 'UI Playground' }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         </CelebrationProvider>

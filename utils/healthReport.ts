@@ -25,7 +25,7 @@ export class HealthReportService {
   // 生成周报告
   static async generateWeeklyReport(startDate: Date): Promise<HealthReport> {
     try {
-      console.log('Generating weekly report, start date:', startDate);
+      if (__DEV__) console.log('Generating weekly report, start date:', startDate);
       
       const endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + 6);
@@ -33,10 +33,10 @@ export class HealthReportService {
       const startDateStr = startDate.toISOString().split('T')[0];
       const endDateStr = endDate.toISOString().split('T')[0];
       
-      console.log('Date range:', startDateStr, 'to', endDateStr);
+      if (__DEV__) console.log('Date range:', startDateStr, 'to', endDateStr);
       
       const records = await StorageService.getRecordsByDateRange(startDateStr, endDateStr);
-      console.log('Found records count:', records.length);
+      if (__DEV__) console.log('Found records count:', records.length);
       
       return this.analyzeRecords(records, 'weekly', startDateStr, endDateStr);
     } catch (error) {
@@ -48,7 +48,7 @@ export class HealthReportService {
   // 生成月报告
   static async generateMonthlyReport(year: number, month: number): Promise<HealthReport> {
     try {
-      console.log('Generating monthly report, year:', year, 'month:', month);
+      if (__DEV__) console.log('Generating monthly report, year:', year, 'month:', month);
       
       const startDate = new Date(year, month, 1);
       const endDate = new Date(year, month + 1, 0);
@@ -56,10 +56,10 @@ export class HealthReportService {
       const startDateStr = startDate.toISOString().split('T')[0];
       const endDateStr = endDate.toISOString().split('T')[0];
       
-      console.log('Date range:', startDateStr, 'to', endDateStr);
+      if (__DEV__) console.log('Date range:', startDateStr, 'to', endDateStr);
       
       const records = await StorageService.getRecordsByDateRange(startDateStr, endDateStr);
-      console.log('Found records count:', records.length);
+      if (__DEV__) console.log('Found records count:', records.length);
       
       return this.analyzeRecords(records, 'monthly', startDateStr, endDateStr);
     } catch (error) {
@@ -70,10 +70,10 @@ export class HealthReportService {
 
   private static analyzeRecords(records: PoopRecord[], reportType: 'weekly' | 'monthly', startDate: string, endDate: string): HealthReport {
     try {
-      console.log('Starting record analysis, record count:', records.length);
+      if (__DEV__) console.log('Starting record analysis, record count:', records.length);
       
       if (records.length === 0) {
-        console.log('No records, generating empty report');
+        if (__DEV__) console.log('No records, generating empty report');
         return this.generateEmptyReport(reportType, startDate, endDate);
       }
 
@@ -82,7 +82,7 @@ export class HealthReportService {
       const daysInPeriod = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
       const averagePerDay = totalRecords / daysInPeriod;
       
-      console.log('Basic statistics completed, total records:', totalRecords, 'days:', daysInPeriod, 'daily average:', averagePerDay);
+      if (__DEV__) console.log('Basic statistics completed, total records:', totalRecords, 'days:', daysInPeriod, 'daily average:', averagePerDay);
     
     // 顺畅度分析
     const smoothLevelSum = records.reduce((sum, record) => sum + record.smoothLevel, 0);

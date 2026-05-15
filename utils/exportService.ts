@@ -5,6 +5,14 @@ import { PoopRecord } from '@/types';
 import { WaterRecord } from '@/types/water';
 import { SmoothLevel } from '@/types';
 
+type LegacyFileSystem = typeof FileSystem & {
+  documentDirectory?: string | null;
+  EncodingType?: {
+    UTF8: string;
+  };
+};
+type WriteStringOptions = NonNullable<Parameters<typeof FileSystem.writeAsStringAsync>[2]>;
+
 export class ExportService {
   // 导出为CSV格式
   static async exportToCSV(): Promise<string> {
@@ -82,11 +90,17 @@ export class ExportService {
   // 保存文件并分享
   static async saveAndShare(content: string, filename: string, mimeType: string = 'text/plain'): Promise<void> {
     try {
-      const fileUri = FileSystem.documentDirectory + filename;
+      const legacyFileSystem = FileSystem as LegacyFileSystem;
+      const documentDirectory = legacyFileSystem.documentDirectory;
+      if (!documentDirectory) {
+        throw new Error('Document directory is not available');
+      }
+      const fileUri = documentDirectory + filename;
+      const encoding = (legacyFileSystem.EncodingType?.UTF8 ?? 'utf8') as WriteStringOptions['encoding'];
       
       // 写入文件
       await FileSystem.writeAsStringAsync(fileUri, content, {
-        encoding: FileSystem.EncodingType.UTF8,
+        encoding,
       });
       
       // 检查是否可以分享

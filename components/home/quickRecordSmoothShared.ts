@@ -35,20 +35,21 @@ export function smoothKey(level: SmoothLevel): string {
   }
 }
 
-export function levelEmoji(lv: SmoothLevel): string {
-  switch (lv) {
+/** Fill color for smooth-level indicators (no emoji). */
+export function smoothLevelFill(level: SmoothLevel): string {
+  switch (level) {
     case SmoothLevel.VERY_DIFFICULT:
-      return '😣';
+      return theme.colors.smoothLevel.veryDifficult;
     case SmoothLevel.DIFFICULT:
-      return '😟';
+      return theme.colors.smoothLevel.difficult;
     case SmoothLevel.NORMAL:
-      return '😐';
+      return theme.colors.smoothLevel.normal;
     case SmoothLevel.SMOOTH:
-      return '🙂';
+      return theme.colors.smoothLevel.smooth;
     case SmoothLevel.VERY_SMOOTH:
-      return '😌';
+      return theme.colors.smoothLevel.verySmooth;
     default:
-      return '😐';
+      return theme.colors.smoothLevel.normal;
   }
 }
 
@@ -67,13 +68,11 @@ export const smoothModalStyles = StyleSheet.create({
     ...theme.elevation.md,
   },
   title: {
-    ...theme.typography.h3,
     color: theme.colors.textPrimary,
     textAlign: 'center',
     marginBottom: theme.spacing.xs,
   },
   hint: {
-    ...theme.typography.caption,
     color: theme.colors.textSecondary,
     textAlign: 'center',
     marginBottom: theme.spacing.md,
@@ -93,12 +92,13 @@ export const smoothModalStyles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceVariant,
     alignItems: 'center',
   },
-  emoji: {
-    fontSize: 44,
+  levelDot: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     marginBottom: theme.spacing.sm,
   },
   levelLabel: {
-    ...theme.typography.h3,
     color: theme.colors.textPrimary,
     textAlign: 'center',
   },

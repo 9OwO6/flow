@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View, Dimensions } from 'react-native';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import { PoopRecord, SmoothLevel } from '@/types';
 import { WaterRecord } from '@/types/water';
 import ModernCard from '@/components/design-system/ModernCard';
@@ -78,9 +78,9 @@ export default function DataVisualization({ records, waterRecords = [], days = 7
                       ]}
                     />
                   </View>
-                  <Text style={styles.barLabel}>{dayLabel}</Text>
+                  <AppText style={styles.barLabel}>{dayLabel}</AppText>
                   {item.count > 0 && (
-                    <Text style={styles.barValue}>{item.count}</Text>
+                    <AppText style={styles.barValue}>{item.count}</AppText>
                   )}
                 </View>
               );
@@ -117,7 +117,7 @@ export default function DataVisualization({ records, waterRecords = [], days = 7
                         ]}
                       />
                     </View>
-                    <Text style={styles.barLabel}>{date.getDate()}</Text>
+                    <AppText style={styles.barLabel}>{date.getDate()}</AppText>
                   </View>
                 );
               }
@@ -148,7 +148,7 @@ export default function DataVisualization({ records, waterRecords = [], days = 7
                       ]}
                     />
                   </View>
-                  <Text style={styles.barLabel}>{date.getDate()}</Text>
+                  <AppText style={styles.barLabel}>{date.getDate()}</AppText>
                 </View>
               );
             })}
@@ -201,7 +201,7 @@ export default function DataVisualization({ records, waterRecords = [], days = 7
                       ]}
                     />
                   </View>
-                  <Text style={styles.barLabel}>{date.getDate()}</Text>
+                  <AppText style={styles.barLabel}>{date.getDate()}</AppText>
                 </View>
               );
             })}
@@ -209,11 +209,11 @@ export default function DataVisualization({ records, waterRecords = [], days = 7
           <View style={styles.legend}>
             <View style={styles.legendItem}>
               <View style={[styles.legendColor, { backgroundColor: theme.colors.info }]} />
-              <Text style={styles.legendText}>{t('dataViz.water')}</Text>
+              <AppText style={styles.legendText}>{t('dataViz.water')}</AppText>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendColor, { backgroundColor: theme.colors.primary }]} />
-              <Text style={styles.legendText}>{t('dataViz.bowelMovement')}</Text>
+              <AppText style={styles.legendText}>{t('dataViz.bowelMovement')}</AppText>
             </View>
           </View>
         </View>

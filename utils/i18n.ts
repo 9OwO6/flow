@@ -16,8 +16,9 @@ const en = {
     loading: 'Loading...',
     success: 'Success!',
     error: 'Error',
-    warning: 'Warning',
+    warning: 'Worth noticing',
     later: 'Later',
+    ok: 'OK',
   },
   
   // 主页
@@ -26,16 +27,16 @@ const en = {
     subtitle: 'Track your body flow',
     quickRecord: 'Track Flow',
     editRecord: 'Edit Flow',
-    healthReport: 'Health Report',
-    todayStats: 'Today\'s Stats',
+    healthReport: 'Pattern Summary',
+    todayStats: 'Today\'s snapshot',
     todayRecords: 'Today\'s Records',
     totalRecords: 'Total Records',
     records: 'records',
-    healthScore: 'Health Score',
+    healthScore: 'Pattern Score',
     cooldownMessage: 'You can record again in {{time}}',
     cooldownDisabled: 'Record disabled',
     motivationalMessage: 'Keep up the good work! 🌟',
-    detailedHealthAnalysis: 'View detailed health analysis reports',
+    detailedHealthAnalysis: 'View personal pattern insights',
     // 幽默消息（改为更有机、健康的提示）
     humorousMessages: [
       'Take a deep breath and relax 🌿',
@@ -47,18 +48,18 @@ const en = {
     buttonSubText: 'Click to record poop',
     cooldownSubText: '{{time}} minutes until available',
     // 报告相关
-    noDataForReport: 'No data available, cannot generate report',
-    generateReportError: 'Failed to generate report, please try again later',
-    generateReportFailed: 'Failed to generate report',
+    noDataForReport: 'Add a few saved entries before opening a summary',
+    generateReportError: 'Could not open the summary. Please try again later.',
+    generateReportFailed: 'Could not open the summary',
     lastPoop: 'Last bowel movement',
-    emptyGuideTitle: 'Start in your own time',
-    emptyGuideSubtitle: 'No entries yet — that is okay.',
+    emptyGuideTitle: 'Start with one simple entry',
+    emptyGuideSubtitle: 'No entries yet. Add one when it feels useful.',
     emptyGuideBullets: [
       'Everything stays on this device until you export or share.',
-      'Use quick log or add details whenever it feels right.',
+      'Use quick log for a fast entry, or add details when you want more context.',
       'This app is for awareness, not diagnosis.',
     ],
-    emptyGuideCta: 'Tap Track Flow when you are ready.',
+    emptyGuideCta: 'Tap Track Flow to save your first entry.',
     recordIntervalTitle: 'Already logged recently',
     recordIntervalMessage:
       'Only one new entry every 3 hours. You can add again in about {{minutes}} minutes. (You can still edit your latest entry in History.)',
@@ -72,7 +73,7 @@ const en = {
     year: 'Year',
     searchPlaceholder: 'Search records...',
     noRecords: 'No records found',
-    noRecordsSubtitle: 'Start tracking your body flow to see your health insights',
+    noRecordsSubtitle: 'Save a few entries to make your personal patterns easier to see.',
     weekTitle: 'This Week\'s Records 📅',
     monthTitle: 'Calendar View',
     yearTitle: 'Year Statistics',
@@ -102,11 +103,14 @@ const en = {
     // 统计相关
     times: 'times',
     recordCount: '{{count}} records',
-    dayRecords: '{{day}} 条记录',
+    dayRecords: '{{day}} records',
     dayRecordsTitle: '{{day}} Records',
     emptyGuidedTitle: 'Your log is empty',
     emptyGuidedSubtitle:
-      'Add a record from the Home tab. Everything stays on this device until you export or share.',
+      'Add your first entry from Home. Everything stays on this device until you export or share.',
+    noRecordsInMonth: 'No records this month',
+    noRecordsInMonthSubtitle: 'Switch months or add a new entry from Home.',
+    backToCurrent: 'Back to current month',
   },
   
   // 记录模态框
@@ -126,52 +130,66 @@ const en = {
   
   // 健康报告
   health: {
-    healthReport: 'Health Report',
-    weeklyReport: 'Weekly Report',
-    monthlyReport: 'Monthly Report',
-    weeklyReportSubtitle: 'View this week\'s health analysis',
-    monthlyReportSubtitle: 'View this month\'s health analysis',
+    healthReport: 'Pattern Insights',
+    weeklyReport: 'Weekly Summary',
+    monthlyReport: 'Monthly Summary',
+    weeklyReportSubtitle: 'Based on your saved entries this week',
+    monthlyReportSubtitle: 'Based on your saved entries this month',
     overview: 'Overview',
     totalRecords: 'Total Records',
     averageFrequency: 'Average Frequency',
     consistency: 'Consistency',
     smoothness: 'Smoothness',
-    healthScore: 'Health Score',
-    recommendations: 'Recommendations',
+    healthScore: 'Pattern Score',
+    recommendations: 'Tips',
     trends: 'Trends',
-    excellent: 'Excellent',
-    good: 'Good',
-    fair: 'Fair',
-    poor: 'Poor',
-    veryPoor: 'Very Poor',
+    excellent: 'More regular',
+    good: 'Mostly regular',
+    fair: 'Some variation',
+    poor: 'Less regular',
+    veryPoor: 'Not enough data',
   },
 
   /** Full localized copy for generated analytics report (UI + service strings) */
   healthReport: {
     periodRange: '{{start}} – {{end}}',
-    scoreTitle: 'Health score',
+    scoreTitle: 'Pattern score',
     scoreOutOf: '/ 100',
-    scoreBandExcellent: 'Excellent',
-    scoreBandGood: 'Good',
-    scoreBandFair: 'Fair',
-    scoreBandPoor: 'Needs improvement',
+    scoreBandExcellent: 'More regular',
+    scoreBandGood: 'Mostly regular',
+    scoreBandFair: 'Some variation',
+    scoreBandPoor: 'Less regular',
     overviewTitle: '📊 Summary',
     statAvgPerDay: 'Avg per day',
     statAvgSmooth: 'Avg comfort',
     statAvgGap: 'Avg gap (days)',
-    ratingTitle: '🏆 Ratings',
+    ratingTitle: '🏆 Pattern signals',
     labelConsistency: 'Regularity',
     labelSmoothness: 'Comfort',
-    labelOverall: 'Overall',
+    labelOverall: 'Overall pattern',
     distributionTitle: '📈 Comfort distribution',
     recommendationsTitle: '💡 Tips',
     trendsTitle: '📊 Trends',
     timePatternTitle: '⏰ Time pattern',
-    reportTitle: '📋 Health report',
-    closeReport: 'Close report',
+    reportTitle: '📋 Pattern summary',
+    basisNote: 'Based only on your saved entries.',
+    reflectionNote: 'For personal reflection, not diagnosis.',
+    closeReport: 'Close summary',
+    regularityBandExcellent: 'More regular',
+    regularityBandGood: 'Mostly regular',
+    regularityBandFair: 'Some variation',
+    regularityBandPoor: 'Less regular',
+    comfortBandExcellent: 'More comfortable',
+    comfortBandGood: 'Mostly comfortable',
+    comfortBandFair: 'Mixed comfort',
+    comfortBandPoor: 'Less comfortable',
+    patternBandExcellent: 'Balanced pattern',
+    patternBandGood: 'Mostly steady',
+    patternBandFair: 'Variable pattern',
+    patternBandPoor: 'Needs more context',
     distCount: '{{count}}× ({{pct}}%)',
     hourCount: '{{count}}×',
-    emptyStart: 'Start logging to better understand your patterns.',
+    emptyStart: 'Consider tracking for a few more days to make this summary more useful.',
     noTrendData: 'Not enough data yet.',
     trendFreqUp: 'Recent frequency is a bit higher.',
     trendFreqDown: 'Recent frequency is a bit lower.',
@@ -190,10 +208,10 @@ const en = {
     rec_sp3: '🧘 Stress can affect digestion—small breaks help.',
     rec_sf1: '🥤 Warm water or light fluids can feel soothing.',
     rec_sf2: '🌾 Swap in some whole grains where easy.',
-    rec_fl1: '📅 If you rarely go, note timing and fluids—you may want clinician input.',
+    rec_fl1: '📅 If entries are rare for you, note timing, fluids, meals, and routine.',
     rec_fl2: '🌅 A relaxed morning routine can help regularity.',
-    rec_fh1: '⚠️ If frequency feels unusually high for you, consider medical advice.',
-    rec_gap1: '🚨 Several days without a movement warrants checking in with a clinician.',
+    rec_fh1: '⚠️ If frequency feels unusually different for you, consider speaking with a healthcare professional.',
+    rec_gap1: '🚨 If several days pass and you feel concerned, consider speaking with a healthcare professional.',
     rec_pos1: '🎉 Patterns look strong—keep the habits that work for you.',
   },
   
@@ -286,6 +304,11 @@ const en = {
     clearDataError: 'Failed to clear data',
     changeLanguageError: 'Failed to change language',
     dataManagement: 'Data Management',
+    trustDataSection: 'Trust & Data',
+    loggingSection: 'Logging',
+    remindersSection: 'Reminders',
+    feedbackSection: 'Feedback & Delight',
+    trustDataFooter: 'Your records stay on this device unless you export or share them yourself.',
     followsSystem: 'Follows system settings',
     description: 'Track your body flow with ease and care',
     reminderSettings: 'Reminder Settings',
@@ -298,7 +321,7 @@ const en = {
     exportJSON: 'Export JSON',
     exportSuccess: 'Data exported successfully',
     exportError: 'Failed to export data',
-    delightSection: 'Sound & feedback',
+    delightSection: 'Feedback & Delight',
     delightSound: 'Success sound',
     delightHaptics: 'Haptics',
     delightMotion: 'Enhanced motion',
@@ -372,6 +395,25 @@ const en = {
     sleepStart: 'Start',
     sleepEnd: 'End',
   },
+
+  /** Relative time labels for last-activity UI (service + screens use i18n, not hardcoded copy). */
+  time: {
+    noRecords: 'No records yet',
+    dayAgo: '1 day ago',
+    daysAgo: '{{count}} days ago',
+    hourAgo: '1 hour ago',
+    hoursAgo: '{{count}} hours ago',
+    minuteAgo: '1 minute ago',
+    minutesAgo: '{{count}} minutes ago',
+    justNow: 'Just now',
+  },
+
+  /** Home reminder banner copy (avoid hardcoded strings in ReminderService). */
+  reminder: {
+    attention: 'Worth noticing',
+    poopStreakMessage:
+      "No entry for {{days}} days. Check your recent pattern, and consider tracking for a few more days.",
+  },
   
   // 数据可视化
   dataViz: {
@@ -414,11 +456,11 @@ const en = {
   // 激励消息
   motivational: {
     default: [
-      { text: 'Health starts with recording!', emoji: '💪' },
+      { text: 'Patterns start with small notes.', emoji: '💪' },
       { text: 'Every record is amazing!', emoji: '✨' }
     ],
     weekly: [
-      { text: 'Regular recording, healthy life!', emoji: '📊' }
+      { text: 'Regular notes make patterns easier to see.', emoji: '📊' }
     ],
     firstRecord: 'Congratulations on your first record! This is a great start!',
     weekRecord: 'Amazing! You\'ve been recording for a week!',
@@ -436,8 +478,8 @@ const en = {
       forceRecord: 'Force Record'
     },
     constipation: {
-      title: 'Constipation Warning! 😰',
-      message: 'No bowel movement for {{days}} days!\nRecommend drinking more water, increasing fiber intake, and consulting a doctor if necessary.',
+      title: 'Pattern check-in',
+      message: 'No entry for {{days}} days. Notice your fluids, meals, and routine; consider qualified health advice if you feel concerned.',
       recordNow: 'Record Now'
     },
     reminder: {
@@ -445,23 +487,23 @@ const en = {
       message: 'No record for {{days}} days\nRemember to drink more water and exercise appropriately~'
     },
     start: {
-      title: 'Start Your Health Journey! 🌟',
-      message: 'Record your first bowel movement and start paying attention to intestinal health!'
+      title: 'Start noticing your pattern',
+      message: 'Record your first entry and begin learning your own rhythm.'
     },
     improvement: {
-      title: 'Improvement Suggestions 🌱',
-      message: 'Recent smoothness is not ideal, suggestions:\n• Eat more fiber-rich foods\n• Increase water intake\n• Exercise appropriately'
+      title: 'Pattern notes',
+      message: 'Recent comfort has been lower. You may want to notice fluids, meals, movement, and routine.'
     },
     excellent: {
-      title: 'Excellent! 🎉',
-      message: 'Recent intestinal health is very good!\nKeep maintaining healthy lifestyle habits~'
+      title: 'Pattern looking steady',
+      message: 'Recent entries look comfortable and regular. Keep noticing what works for you.'
     },
     motivational: {
       messages: [
-        'Every record is care for health 💖',
+        'Every entry helps you notice your pattern 💖',
         'Keep recording, discover body patterns 📊',
-        'Healthy life starts with small records 🌟',
-        'You are becoming your own health manager 👨‍⚕️',
+        'Small records can reveal useful patterns 🌟',
+        'You are learning your own rhythm',
         'Regular recording, better quality of life ✨'
       ],
       firstRecord: 'Congratulations on your first record! 🎊',
@@ -471,9 +513,9 @@ const en = {
     },
     healthScore: {
       startRecording: 'Start Recording',
-      needsImprovement: 'Needs Improvement',
-      good: 'Good Health',
-      excellent: 'Excellent Health',
+      needsImprovement: 'Needs more context',
+      good: 'Mostly steady',
+      excellent: 'More regular',
       calculationError: 'Calculation Error'
     }
   },
@@ -501,8 +543,9 @@ const zh = {
     loading: '加载中...',
     success: '成功！',
     error: '错误',
-    warning: '警告',
+    warning: '值得留意',
     later: '稍后再说',
+    ok: '确定',
   },
   
   // 主页
@@ -511,16 +554,16 @@ const zh = {
     subtitle: '记录身体自然律动',
     quickRecord: '快速记录',
     editRecord: '编辑记录',
-    healthReport: '健康报告',
-    todayStats: '今日统计',
+    healthReport: '模式总结',
+    todayStats: '今日概览',
     todayRecords: '今日记录',
     totalRecords: '总记录',
     records: '条记录',
-    healthScore: '健康评分',
+    healthScore: '模式分数',
     cooldownMessage: '{{time}}后可以再次记录',
     cooldownDisabled: '记录已禁用',
     motivationalMessage: '继续保持好习惯！🌟',
-    detailedHealthAnalysis: '查看详细健康分析报告',
+    detailedHealthAnalysis: '查看个人模式洞察',
     // 幽默消息
     humorousMessages: [
       '休息一下，让肠道放松 🛌',
@@ -532,18 +575,18 @@ const zh = {
     buttonSubText: '点击记录便便',
     cooldownSubText: '{{time}}分钟后可用',
     // 报告相关
-    noDataForReport: '没有可用数据，无法生成报告',
-    generateReportError: '生成报告失败，请稍后重试',
-    generateReportFailed: '生成报告失败',
+    noDataForReport: '多保存几条记录后再查看总结',
+    generateReportError: '暂时无法打开总结，请稍后再试',
+    generateReportFailed: '暂时无法打开总结',
     lastPoop: '上次排便',
-    emptyGuideTitle: '按自己的节奏开始',
-    emptyGuideSubtitle: '还没有记录——这很正常。',
+    emptyGuideTitle: '从一条简单记录开始',
+    emptyGuideSubtitle: '还没有记录。觉得有用时再添加即可。',
     emptyGuideBullets: [
       '数据仅保存在本机，除非你导出或主动分享。',
       '随时用快速记录或详细表单添加条目。',
       '本应用用于自我观察，不能替代诊疗。',
     ],
-    emptyGuideCta: '准备好后，点击「快速记录」即可。',
+    emptyGuideCta: '点击「快速记录」保存第一条记录。',
     recordIntervalTitle: '最近已记过一次',
     recordIntervalMessage:
       '每 3 小时只能新增 1 条记录，约 {{minutes}} 分钟后可再记。（可在历史里编辑最新一条。）',
@@ -557,9 +600,9 @@ const zh = {
     year: '年度',
     searchPlaceholder: '搜索记录...',
     noRecords: '没有找到记录',
-    noRecordsSubtitle: '开始追踪身体律动，查看健康洞察',
+    noRecordsSubtitle: '保存几条记录后，个人模式会更容易看见。',
     noRecordsInMonth: '本月暂无记录',
-    noRecordsInMonthSubtitle: '可以切换月份查看其他时间的记录',
+    noRecordsInMonthSubtitle: '可以切换月份，或从首页添加新记录。',
     backToCurrent: '回到当前月',
     weekTitle: '本周记录 📅',
     monthTitle: '日历视图',
@@ -590,6 +633,7 @@ const zh = {
     // 统计相关
     times: '次',
     recordCount: '{{count}} 条记录',
+    dayRecords: '{{day}} 条记录',
     dayRecordsTitle: '{{day}} 条记录',
     emptyGuidedTitle: '还没有记录',
     emptyGuidedSubtitle:
@@ -613,51 +657,65 @@ const zh = {
   
   // 健康报告
   health: {
-    healthReport: '健康报告',
-    weeklyReport: '周报告',
-    monthlyReport: '月报告',
-    weeklyReportSubtitle: '查看本周的健康分析',
-    monthlyReportSubtitle: '查看本月的健康分析',
+    healthReport: '模式洞察',
+    weeklyReport: '周总结',
+    monthlyReport: '月总结',
+    weeklyReportSubtitle: '基于本周已保存的记录',
+    monthlyReportSubtitle: '基于本月已保存的记录',
     overview: '概览',
     totalRecords: '总记录数',
     averageFrequency: '平均频率',
     consistency: '一致性',
     smoothness: '顺畅度',
-    healthScore: '健康评分',
-    recommendations: '建议',
+    healthScore: '模式分数',
+    recommendations: '提示',
     trends: '趋势',
-    excellent: '优秀',
-    good: '良好',
-    fair: '一般',
-    poor: '较差',
-    veryPoor: '很差',
+    excellent: '更规律',
+    good: '基本规律',
+    fair: '有些波动',
+    poor: '不太规律',
+    veryPoor: '数据不足',
   },
 
   healthReport: {
     periodRange: '{{start}} 至 {{end}}',
-    scoreTitle: '健康评分',
+    scoreTitle: '模式分数',
     scoreOutOf: '/ 100',
-    scoreBandExcellent: '优秀',
-    scoreBandGood: '良好',
-    scoreBandFair: '一般',
-    scoreBandPoor: '需要改善',
+    scoreBandExcellent: '更规律',
+    scoreBandGood: '基本规律',
+    scoreBandFair: '有些波动',
+    scoreBandPoor: '不太规律',
     overviewTitle: '📊 基础统计',
     statAvgPerDay: '日均次数',
     statAvgSmooth: '平均顺畅度',
     statAvgGap: '平均间隔（天）',
-    ratingTitle: '🏆 健康评级',
+    ratingTitle: '🏆 模式信号',
     labelConsistency: '规律性',
     labelSmoothness: '顺畅度',
-    labelOverall: '整体健康',
+    labelOverall: '整体模式',
     distributionTitle: '📈 顺畅度分布',
-    recommendationsTitle: '💡 健康建议',
+    recommendationsTitle: '💡 小提示',
     trendsTitle: '📊 趋势分析',
     timePatternTitle: '⏰ 时间模式',
-    reportTitle: '📋 健康报告',
-    closeReport: '关闭报告',
+    reportTitle: '📋 模式总结',
+    basisNote: '仅基于你已保存的记录。',
+    reflectionNote: '用于个人回顾，不用于诊断。',
+    closeReport: '关闭总结',
+    regularityBandExcellent: '更规律',
+    regularityBandGood: '基本规律',
+    regularityBandFair: '有些波动',
+    regularityBandPoor: '不太规律',
+    comfortBandExcellent: '更舒适',
+    comfortBandGood: '基本舒适',
+    comfortBandFair: '舒适度有波动',
+    comfortBandPoor: '不太舒适',
+    patternBandExcellent: '模式较平衡',
+    patternBandGood: '整体较稳定',
+    patternBandFair: '模式有波动',
+    patternBandPoor: '需要更多记录',
     distCount: '{{count}}次 ({{pct}}%)',
     hourCount: '{{count}}次',
-    emptyStart: '建议开始记录，以便更好地了解自身节律。',
+    emptyStart: '可以再连续记录几天，让总结更有参考价值。',
     noTrendData: '暂无数据',
     trendFreqUp: '📈 最近排便频率有所上升',
     trendFreqDown: '📉 最近排便频率有所下降',
@@ -678,8 +736,8 @@ const zh = {
     rec_sf2: '🌾 可选用全麦等粗粮替代部分精制主食。',
     rec_fl1: '📅 若长期偏少，可记录并咨询专业人士。',
     rec_fl2: '🌅 早晨留出放松时间，有助于形成节律。',
-    rec_fh1: '⚠️ 若频率异常偏高，建议咨询医生。',
-    rec_gap1: '🚨 连续多日未有排便，建议及时就医评估。',
+    rec_fh1: '⚠️ 若频率和你平时明显不同，可以考虑咨询专业人士。',
+    rec_gap1: '🚨 连续多日没有记录到排便，若你感到担心，可以寻求专业意见。',
     rec_pos1: '🎉 整体节律不错——继续保持适合你的习惯。',
   },
   
@@ -761,7 +819,8 @@ const zh = {
   },
   
   reminder: {
-    attention: '注意',
+    attention: '值得留意',
+    poopStreakMessage: '已经 {{days}} 天没有新增记录。可以查看最近的模式，也可以再连续记录几天。',
   },
   
   // 设置
@@ -783,6 +842,11 @@ const zh = {
     clearDataError: '清除数据失败',
     changeLanguageError: '切换语言失败',
     dataManagement: '数据管理',
+    trustDataSection: '信任与数据',
+    loggingSection: '记录',
+    remindersSection: '提醒',
+    feedbackSection: '反馈与愉悦感',
+    trustDataFooter: '记录保存在本机，除非你主动导出或分享。',
     followsSystem: '跟随系统设置',
     description: '轻松追踪身体律动，关爱健康',
     reminderSettings: '提醒设置',
@@ -795,7 +859,7 @@ const zh = {
     exportJSON: '导出 JSON',
     exportSuccess: '数据导出成功',
     exportError: '数据导出失败',
-    delightSection: '声音与反馈',
+    delightSection: '反馈与愉悦感',
     delightSound: '成功音效',
     delightHaptics: '触感反馈',
     delightMotion: '增强动效',
@@ -869,6 +933,17 @@ const zh = {
     sleepStart: '开始',
     sleepEnd: '结束',
   },
+
+  time: {
+    noRecords: '暂无记录',
+    dayAgo: '1 天前',
+    daysAgo: '{{count}} 天前',
+    hourAgo: '1 小时前',
+    hoursAgo: '{{count}} 小时前',
+    minuteAgo: '1 分钟前',
+    minutesAgo: '{{count}} 分钟前',
+    justNow: '刚刚',
+  },
   
   // 数据可视化
   dataViz: {
@@ -911,11 +986,11 @@ const zh = {
   // 激励消息
   motivational: {
     default: [
-      { text: '健康从记录开始！', emoji: '💪' },
+      { text: '模式从小记录开始。', emoji: '💪' },
       { text: '每一次记录都很棒！', emoji: '✨' }
     ],
     weekly: [
-      { text: '规律记录，健康生活！', emoji: '📊' }
+      { text: '规律记录，让模式更容易看见。', emoji: '📊' }
     ],
     firstRecord: '恭喜完成第一次记录！这是一个很好的开始！',
     weekRecord: '太棒了！坚持记录一周了！',
@@ -933,8 +1008,8 @@ const zh = {
       forceRecord: '强制记录'
     },
     constipation: {
-      title: '便秘警告! 😰',
-      message: '已经{{days}}天没有便便了！\n建议多喝水、增加纤维摄入，必要时咨询医生。',
+      title: '模式提醒',
+      message: '已经 {{days}} 天没有新增记录。可以留意饮水、饮食和日常节律；如果你感到担心，可以咨询专业人士。',
       recordNow: '记录一次'
     },
     reminder: {
@@ -942,23 +1017,23 @@ const zh = {
       message: '已经{{days}}天没有记录了\n记得多喝水，适当运动哦～'
     },
     start: {
-      title: '开始你的健康之旅! 🌟',
-      message: '记录你的第一次便便，开始关注肠道健康吧！'
+      title: '开始观察自己的模式',
+      message: '记录第一条，慢慢了解自己的身体节律。'
     },
     improvement: {
-      title: '改善建议 🌱',
-      message: '最近的顺畅度不太理想，建议：\n• 多吃富含纤维的食物\n• 增加水分摄入\n• 适当运动'
+      title: '模式笔记',
+      message: '最近的舒适度偏低。可以留意饮水、饮食、活动和日常节律。'
     },
     excellent: {
       title: '太棒了! 🎉',
-      message: '最近的肠道健康状况很好！\n继续保持健康的生活习惯～'
+      message: '最近的记录看起来较舒适、较规律。继续留意适合自己的节律。'
     },
     motivational: {
       messages: [
-        '每一次记录都是对健康的关爱 💖',
+        '每一次记录都能帮助你看见模式 💖',
         '坚持记录，发现身体的规律 📊',
-        '健康生活从点滴记录开始 🌟',
-        '你正在成为自己的健康管家 👨‍⚕️',
+        '小记录也能慢慢形成有用的线索 🌟',
+        '你正在了解自己的身体节律',
         '规律记录，拥有更好的生活质量 ✨'
       ],
       firstRecord: '恭喜完成第一次记录! 🎊',
@@ -968,9 +1043,9 @@ const zh = {
     },
     healthScore: {
       startRecording: '开始记录',
-      needsImprovement: '需要改善',
-      good: '健康良好',
-      excellent: '非常健康',
+      needsImprovement: '需要更多记录',
+      good: '整体较稳定',
+      excellent: '更规律',
       calculationError: '计算错误'
     }
   },
@@ -1024,6 +1099,7 @@ try {
       interpolation: {
         escapeValue: false,
       },
+      returnEmptyString: true,
       react: {
         useSuspense: false,
       },
@@ -1052,6 +1128,7 @@ try {
       resources: { en: { translation: en }, zh: { translation: zh } },
       lng: 'en',
       fallbackLng: 'en',
+      returnEmptyString: true,
     });
   }
 }

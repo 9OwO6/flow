@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 
 interface Tab {
   key: string;
@@ -28,14 +29,12 @@ export default function SegmentedTabs({ tabs, selectedKey, onSelect }: Segmented
             onPress={() => onSelect(tab.key)}
             activeOpacity={0.7}
           >
-            <Text
-              style={[
-                styles.tabText,
-                isSelected && styles.tabTextSelected,
-              ]}
+            <AppText
+              variant={isSelected ? 'button' : 'body2'}
+              style={isSelected ? styles.tabTextSelected : styles.tabTextIdle}
             >
               {tab.label}
-            </Text>
+            </AppText>
           </TouchableOpacity>
         );
       })}
@@ -64,13 +63,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     ...theme.elevation.sm,
   },
-  tabText: {
-    ...theme.typography.body2,
+  tabTextIdle: {
     color: theme.colors.textSecondary,
     fontWeight: '500',
   },
   tabTextSelected: {
-    ...theme.typography.button,
     color: theme.colors.primary,
   },
 });

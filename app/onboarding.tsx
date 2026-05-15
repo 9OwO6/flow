@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import theme from '@/constants/DesignTokens';
 import PrimaryButton from '@/components/design-system/PrimaryButton';
 import ModernCard from '@/components/design-system/ModernCard';
@@ -32,21 +32,21 @@ export default function OnboardingScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>{t('onboarding.pageTitle')}</Text>
+        <AppText style={styles.pageTitle}>{t('onboarding.pageTitle')}</AppText>
 
         <ModernCard elevation="md" padding="lg" style={styles.card}>
-          <Text style={styles.h}>{t('onboarding.privacyHeading')}</Text>
-          <Text style={styles.p}>{t('onboarding.privacyText')}</Text>
+          <AppText style={styles.h}>{t('onboarding.privacyHeading')}</AppText>
+          <AppText style={styles.p}>{t('onboarding.privacyText')}</AppText>
         </ModernCard>
 
         <ModernCard elevation="md" padding="lg" style={styles.card}>
-          <Text style={styles.h}>{t('onboarding.whyHeading')}</Text>
-          <Text style={styles.p}>{t('onboarding.whyText')}</Text>
+          <AppText style={styles.h}>{t('onboarding.whyHeading')}</AppText>
+          <AppText style={styles.p}>{t('onboarding.whyText')}</AppText>
         </ModernCard>
 
         <ModernCard elevation="md" padding="lg" style={styles.card}>
-          <Text style={styles.h}>{t('onboarding.disclaimerHeading')}</Text>
-          <Text style={styles.p}>{t('onboarding.disclaimerText')}</Text>
+          <AppText style={styles.h}>{t('onboarding.disclaimerHeading')}</AppText>
+          <AppText style={styles.p}>{t('onboarding.disclaimerText')}</AppText>
         </ModernCard>
       </ScrollView>
 

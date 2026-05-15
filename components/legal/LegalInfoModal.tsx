@@ -8,8 +8,9 @@ import {
   useWindowDimensions,
   Platform,
 } from 'react-native';
-import { Text } from '@/components/Themed';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 
 type Props = {
   visible: boolean;
@@ -34,16 +35,17 @@ export default function LegalInfoModal({
     >
       <View style={[styles.wrap, { maxHeight: height * 0.92 }]}>
         <View style={styles.header}>
-          <Text style={styles.title} numberOfLines={2}>
+          <AppText variant="h3" style={styles.title} numberOfLines={2}>
             {title}
-          </Text>
+          </AppText>
           <Pressable
             onPress={onClose}
             hitSlop={16}
             accessibilityRole="button"
+            accessibilityLabel="Close"
             style={({ pressed }) => [styles.closeBtn, pressed && { opacity: 0.65 }]}
           >
-            <Text style={styles.closeLabel}>✕</Text>
+            <FontAwesome name="close" size={22} color={theme.colors.textPrimary} />
           </Pressable>
         </View>
         <ScrollView
@@ -52,7 +54,9 @@ export default function LegalInfoModal({
           showsVerticalScrollIndicator
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.body}>{body}</Text>
+          <AppText variant="body2" color="secondary" style={styles.body}>
+            {body}
+          </AppText>
         </ScrollView>
       </View>
     </Modal>
@@ -79,8 +83,6 @@ const styles = StyleSheet.create({
     elevation: Platform.OS === 'android' ? 6 : 0,
   },
   title: {
-    ...theme.typography.h3,
-    color: theme.colors.textPrimary,
     flex: 1,
     marginRight: theme.spacing.md,
   },
@@ -90,19 +92,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeLabel: {
-    ...theme.typography.h3,
-    color: theme.colors.textPrimary,
-    fontWeight: '600',
-  },
   scroll: { flex: 1 },
   scrollContent: {
     padding: theme.spacing.lg,
     paddingBottom: theme.spacing.xl * 2,
   },
   body: {
-    ...theme.typography.body2,
-    color: theme.colors.textSecondary,
     lineHeight: 22,
   },
 });

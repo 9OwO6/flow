@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 
 interface EmptyStateProps {
   icon?: string;
@@ -16,8 +16,14 @@ export default function EmptyState({ icon = 'leaf', title, subtitle }: EmptyStat
       <View style={styles.iconContainer}>
         <FontAwesome name={icon as any} size={48} color={theme.colors.textTertiary} />
       </View>
-      <Text style={styles.title}>{title}</Text>
-      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+      <AppText variant="h3" color="secondary" style={styles.title}>
+        {title}
+      </AppText>
+      {subtitle ? (
+        <AppText variant="body2" color="tertiary" style={styles.subtitle}>
+          {subtitle}
+        </AppText>
+      ) : null}
     </View>
   );
 }
@@ -40,14 +46,10 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   title: {
-    ...theme.typography.h3,
-    color: theme.colors.textSecondary,
     marginBottom: theme.spacing.sm,
     textAlign: 'center',
   },
   subtitle: {
-    ...theme.typography.body2,
-    color: theme.colors.textTertiary,
     textAlign: 'center',
   },
 });

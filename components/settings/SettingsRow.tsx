@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Switch, type SwitchProps } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Switch, type SwitchProps } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 
 type Props = {
   label: string;
@@ -27,12 +29,20 @@ export function SettingsRowPressable({
       disabled={!onPress}
     >
       <View style={styles.left}>
-        <Text style={styles.label}>{label}</Text>
-        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        <AppText variant="body" style={styles.label}>
+          {label}
+        </AppText>
+        {subtitle ? (
+          <AppText variant="caption" color="tertiary" style={styles.subtitle}>
+            {subtitle}
+          </AppText>
+        ) : null}
       </View>
       <View style={styles.right}>
         {children}
-        {showChevron ? <Text style={styles.chevron}>›</Text> : null}
+        {showChevron ? (
+          <FontAwesome name="chevron-right" size={14} color={theme.colors.textTertiary} />
+        ) : null}
       </View>
     </TouchableOpacity>
   );
@@ -55,8 +65,14 @@ export function SettingsRowToggle({
   return (
     <View style={[styles.row, styles.rowStatic, !isFirst && styles.rowBorder]}>
       <View style={styles.left}>
-        <Text style={styles.label}>{label}</Text>
-        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        <AppText variant="body" style={styles.label}>
+          {label}
+        </AppText>
+        {subtitle ? (
+          <AppText variant="caption" color="tertiary" style={styles.subtitle}>
+            {subtitle}
+          </AppText>
+        ) : null}
       </View>
       <Switch
         value={value}
@@ -93,17 +109,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    ...theme.typography.body,
     color: theme.colors.textPrimary,
   },
   subtitle: {
-    ...theme.typography.caption,
-    color: theme.colors.textTertiary,
     marginTop: 2,
-  },
-  chevron: {
-    fontSize: 22,
-    color: theme.colors.textTertiary,
-    fontWeight: '300',
   },
 });

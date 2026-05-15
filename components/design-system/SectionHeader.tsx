@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 
 interface SectionHeaderProps {
   title: string;
@@ -12,8 +13,14 @@ export default function SectionHeader({ title, subtitle, action }: SectionHeader
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
-        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        <AppText variant="h3" style={styles.title}>
+          {title}
+        </AppText>
+        {subtitle ? (
+          <AppText variant="body2" color="secondary" style={styles.subtitle}>
+            {subtitle}
+          </AppText>
+        ) : null}
       </View>
       {action && <View style={styles.action}>{action}</View>}
     </View>
@@ -32,14 +39,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    ...theme.typography.h3,
-    color: theme.colors.textPrimary,
     marginBottom: theme.spacing.xs,
   },
-  subtitle: {
-    ...theme.typography.body2,
-    color: theme.colors.textSecondary,
-  },
+  subtitle: {},
   action: {
     marginLeft: theme.spacing.md,
   },

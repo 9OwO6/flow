@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Alert, Platform, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { Audio } from 'expo-av';
 import * as DocumentPicker from 'expo-document-picker';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import { useTranslation } from 'react-i18next';
 import theme from '@/constants/DesignTokens';
 import { delight } from '@/utils/delight';
@@ -191,7 +191,7 @@ export default function CustomSuccessSoundsSection() {
 
   return (
     <SettingsGroup title={t('settings.customSoundSection')}>
-      <Text style={styles.hint}>{t('settings.customSoundHint')}</Text>
+      <AppText style={styles.hint}>{t('settings.customSoundHint')}</AppText>
       <SettingsRowToggle
         isFirst
         label={t('settings.customSoundUseCustom')}
@@ -213,7 +213,7 @@ export default function CustomSuccessSoundsSection() {
         thumbColor={filledCount >= 2 && prefs.random ? theme.colors.primary : theme.colors.textTertiary}
       />
       {filledCount < 2 ? (
-        <Text style={styles.randomNote}>{t('settings.customSoundRandomNeedTwo')}</Text>
+        <AppText style={styles.randomNote}>{t('settings.customSoundRandomNeedTwo')}</AppText>
       ) : null}
 
       {[0, 1, 2].map((i) => {
@@ -223,17 +223,17 @@ export default function CustomSuccessSoundsSection() {
         const isBusy = busySlot === slot;
         return (
           <View key={slot} style={[styles.slotBlock, slot > 0 && styles.slotBorder]}>
-            <Text style={styles.slotTitle}>
+            <AppText style={styles.slotTitle}>
               {t('settings.customSoundSlot', { n: slot + 1 })}
               {occupied ? ` · ${prefs.slots[slot]}` : ''}
-            </Text>
+            </AppText>
             <View style={styles.slotActions}>
               <Pressable
                 style={({ pressed }) => [styles.smallBtn, pressed && { opacity: 0.75 }]}
                 disabled={isRecording || isBusy || recordingSlot !== null}
                 onPress={() => void onPickFile(slot)}
               >
-                <Text style={styles.smallBtnText}>{t('settings.customSoundImport')}</Text>
+                <AppText style={styles.smallBtnText}>{t('settings.customSoundImport')}</AppText>
               </Pressable>
               {!isRecording ? (
                 <Pressable
@@ -241,7 +241,7 @@ export default function CustomSuccessSoundsSection() {
                   disabled={isBusy || recordingSlot !== null}
                   onPress={() => void startRecording(slot)}
                 >
-                  <Text style={styles.smallBtnText}>{t('settings.customSoundRecord')}</Text>
+                  <AppText style={styles.smallBtnText}>{t('settings.customSoundRecord')}</AppText>
                 </Pressable>
               ) : (
                 <Pressable
@@ -249,9 +249,9 @@ export default function CustomSuccessSoundsSection() {
                   disabled={isBusy}
                   onPress={() => void stopRecording()}
                 >
-                  <Text style={[styles.smallBtnText, styles.stopBtnText]}>
+                  <AppText style={[styles.smallBtnText, styles.stopBtnText]}>
                     {t('settings.customSoundStop')}
-                  </Text>
+                  </AppText>
                 </Pressable>
               )}
               <Pressable
@@ -259,14 +259,14 @@ export default function CustomSuccessSoundsSection() {
                 disabled={!occupied || isRecording || isBusy}
                 onPress={() => void onPreviewSlot(slot)}
               >
-                <Text style={styles.smallBtnText}>{t('settings.customSoundPreview')}</Text>
+                <AppText style={styles.smallBtnText}>{t('settings.customSoundPreview')}</AppText>
               </Pressable>
               <Pressable
                 style={({ pressed }) => [styles.smallBtn, pressed && { opacity: 0.75 }]}
                 disabled={!occupied || isRecording || isBusy}
                 onPress={() => void onClearSlot(slot)}
               >
-                <Text style={styles.smallBtnText}>{t('settings.customSoundRemove')}</Text>
+                <AppText style={styles.smallBtnText}>{t('settings.customSoundRemove')}</AppText>
               </Pressable>
             </View>
             {isBusy && !isRecording ? <ActivityIndicator style={styles.inlineSpinner} color={theme.colors.primary} /> : null}

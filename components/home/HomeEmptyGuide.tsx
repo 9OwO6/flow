@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import ModernCard from '@/components/design-system/ModernCard';
 import theme from '@/constants/DesignTokens';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -22,16 +22,16 @@ export default function HomeEmptyGuide() {
           color={theme.colors.primary}
         />
         <View style={styles.textCol}>
-          <Text style={styles.title}>{t('home.emptyGuideTitle')}</Text>
-          <Text style={styles.subtitle}>{t('home.emptyGuideSubtitle')}</Text>
+          <AppText style={styles.title}>{t('home.emptyGuideTitle')}</AppText>
+          <AppText style={styles.subtitle}>{t('home.emptyGuideSubtitle')}</AppText>
         </View>
       </View>
       {items.map((line, i) => (
-        <Text key={i} style={styles.bullet}>
+        <AppText key={i} style={styles.bullet}>
           · {line}
-        </Text>
+        </AppText>
       ))}
-      <Text style={styles.hint}>{t('home.emptyGuideCta')}</Text>
+      <AppText style={styles.hint}>{t('home.emptyGuideCta')}</AppText>
     </ModernCard>
   );
 }

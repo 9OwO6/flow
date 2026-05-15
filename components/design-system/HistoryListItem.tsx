@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/Themed';
+import { StyleSheet, View } from 'react-native';
 import theme from '@/constants/DesignTokens';
-import ModernCard from './ModernCard';
+import ModernCard from '@/components/design-system/ModernCard';
+import AppText from '@/components/design-system/AppText';
 import { PoopRecord, SmoothLevel } from '@/types';
 
 interface HistoryListItemProps {
@@ -21,36 +21,40 @@ export default function HistoryListItem({
   const config = smoothLevelConfig[record.smoothLevel];
 
   return (
-    <TouchableOpacity
+    <ModernCard
+      elevation="sm"
+      padding="md"
       onPress={onPress}
       onLongPress={onLongPress}
-      activeOpacity={0.7}
+      style={styles.item}
     >
-      <ModernCard elevation="sm" padding="md" style={styles.item}>
-        <View style={styles.content}>
-          <View style={styles.leftSection}>
-            <View style={[styles.indicator, { backgroundColor: config.color }]} />
-            <View style={styles.info}>
-              <Text style={styles.date}>{record.date}</Text>
-              <Text style={styles.time}>{record.time}</Text>
-            </View>
-          </View>
-          
-          <View style={styles.rightSection}>
-            <View style={[styles.levelBadge, { backgroundColor: config.color + '20' }]}>
-              <Text style={[styles.levelText, { color: config.color }]}>
-                {config.label}
-              </Text>
-            </View>
-            {record.notes && (
-              <Text style={styles.notes} numberOfLines={1}>
-                {record.notes}
-              </Text>
-            )}
+      <View style={styles.content}>
+        <View style={styles.leftSection}>
+          <View style={[styles.indicator, { backgroundColor: config.color }]} />
+          <View style={styles.info}>
+            <AppText variant="h3" color="primary" style={styles.date}>
+              {record.date}
+            </AppText>
+            <AppText variant="caption" color="secondary">
+              {record.time}
+            </AppText>
           </View>
         </View>
-      </ModernCard>
-    </TouchableOpacity>
+
+        <View style={styles.rightSection}>
+          <View style={[styles.levelBadge, { backgroundColor: `${config.color}33` }]}>
+            <AppText variant="caption" color="primary" style={[styles.levelText, { color: config.color }]}>
+              {config.label}
+            </AppText>
+          </View>
+          {record.notes ? (
+            <AppText variant="body2" color="tertiary" style={styles.notes} numberOfLines={2} ellipsizeMode="tail">
+              {record.notes}
+            </AppText>
+          ) : null}
+        </View>
+      </View>
+    </ModernCard>
   );
 }
 
@@ -78,13 +82,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   date: {
-    ...theme.typography.h3,
-    color: theme.colors.textPrimary,
     marginBottom: theme.spacing.xs,
-  },
-  time: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
   },
   rightSection: {
     alignItems: 'flex-end',
@@ -97,13 +95,9 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xs,
   },
   levelText: {
-    ...theme.typography.caption,
     fontWeight: '600',
   },
   notes: {
-    ...theme.typography.body2,
-    color: theme.colors.textTertiary,
     textAlign: 'right',
   },
 });
-

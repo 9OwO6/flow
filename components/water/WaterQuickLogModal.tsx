@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, View, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import { useTranslation } from 'react-i18next';
 import theme from '@/constants/DesignTokens';
 import PrimaryButton from '@/components/design-system/PrimaryButton';
@@ -35,8 +35,8 @@ export default function WaterQuickLogModal({ visible, onClose, onLogged }: Props
       <View style={styles.backdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         <View style={styles.sheet}>
-          <Text style={styles.title}>{t('water.quickLogTitle')}</Text>
-          <Text style={styles.sub}>{t('water.quickLogSub')}</Text>
+          <AppText style={styles.title}>{t('water.quickLogTitle')}</AppText>
+          <AppText style={styles.sub}>{t('water.quickLogSub')}</AppText>
 
           <View style={styles.grid}>
             {AMOUNTS.map((ml) => (
@@ -47,7 +47,7 @@ export default function WaterQuickLogModal({ visible, onClose, onLogged }: Props
                 disabled={busy}
                 activeOpacity={0.85}
               >
-                <Text style={styles.chipText}>+{ml} ml</Text>
+                <AppText style={styles.chipText}>+{ml} ml</AppText>
               </TouchableOpacity>
             ))}
           </View>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
 import theme from '@/constants/DesignTokens';
 
 export const SHARE_CARD_WIDTH = 360;
@@ -45,30 +45,30 @@ export default function SevenDayShareCard({
   return (
     <View style={styles.root} collapsable={false}>
       <View style={styles.header}>
-        <Text style={styles.brand}>{strings.brand}</Text>
-        <Text style={styles.headline}>{strings.headline}</Text>
-        <Text style={styles.range}>{strings.range}</Text>
+        <AppText style={styles.brand}>{strings.brand}</AppText>
+        <AppText style={styles.headline}>{strings.headline}</AppText>
+        <AppText style={styles.range}>{strings.range}</AppText>
       </View>
       <View style={styles.stats}>
-        <Text style={styles.statLine}>
-          <Text style={styles.statEm}>{strings.totalLabel}</Text> {totalRecords}
-        </Text>
-        <Text style={styles.statLine}>{avgComfortLine}</Text>
-        <Text style={styles.statLine}>{trendLine}</Text>
+        <AppText style={styles.statLine}>
+          <AppText style={styles.statEm}>{strings.totalLabel}</AppText> {totalRecords}
+        </AppText>
+        <AppText style={styles.statLine}>{avgComfortLine}</AppText>
+        <AppText style={styles.statLine}>{trendLine}</AppText>
       </View>
       <View style={styles.tags}>
-        <Text style={styles.tagsTitle}>{strings.tagsTitle}</Text>
+        <AppText style={styles.tagsTitle}>{strings.tagsTitle}</AppText>
         {tagLines.length === 0 ? (
-          <Text style={styles.tagMuted}>{strings.noTags}</Text>
+          <AppText style={styles.tagMuted}>{strings.noTags}</AppText>
         ) : (
           tagLines.slice(0, 4).map((t, i) => (
-            <Text key={i} style={styles.tagLine}>
+            <AppText key={i} style={styles.tagLine}>
               {formatTag(t)}
-            </Text>
+            </AppText>
           ))
         )}
       </View>
-      <Text style={styles.disclaimer}>{strings.disclaimer}</Text>
+      <AppText style={styles.disclaimer}>{strings.disclaimer}</AppText>
     </View>
   );
 }

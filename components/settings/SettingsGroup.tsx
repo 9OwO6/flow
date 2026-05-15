@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import theme from '@/constants/DesignTokens';
+import AppText from '@/components/design-system/AppText';
 
 type Props = {
   title?: string;
@@ -11,9 +12,17 @@ type Props = {
 export default function SettingsGroup({ title, footer, children }: Props) {
   return (
     <View style={styles.wrap}>
-      {title ? <Text style={styles.sectionTitle}>{title}</Text> : null}
+      {title ? (
+        <AppText variant="caption" color="secondary" style={styles.sectionTitle}>
+          {title}
+        </AppText>
+      ) : null}
       <View style={styles.card}>{children}</View>
-      {footer ? <Text style={styles.footer}>{footer}</Text> : null}
+      {footer ? (
+        <AppText variant="caption" color="tertiary" style={styles.footer}>
+          {footer}
+        </AppText>
+      ) : null}
     </View>
   );
 }
@@ -23,8 +32,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   sectionTitle: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
     marginLeft: theme.spacing.md,
     marginBottom: theme.spacing.sm,
     fontWeight: '600',
@@ -38,8 +45,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   footer: {
-    ...theme.typography.caption,
-    color: theme.colors.textTertiary,
     marginLeft: theme.spacing.md,
     marginTop: theme.spacing.sm,
     lineHeight: 18,

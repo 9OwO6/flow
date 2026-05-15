@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Alert, Animated, ScrollView, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
-import { Text } from '@/components/Themed';
+import AppText from '@/components/design-system/AppText';
+import AppConfirmDialog, { AppAlertDialog } from '@/components/design-system/AppConfirmDialog';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
@@ -65,6 +66,8 @@ export default function SettingsScreen() {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
+  const [clearFeedback, setClearFeedback] = useState<{ title: string; message: string } | null>(null);
 
   // 页面加载动画
   useEffect(() => {
@@ -174,31 +177,20 @@ export default function SettingsScreen() {
     }
   };
 
-  // 清除所有数据
+  // Clear all data — destructive confirm (not system Alert chain)
   const handleClearData = () => {
-    Alert.alert(
-      t('settings.clearData'),
-      t('settings.clearDataConfirm'),
-      [
-        {
-          text: t('common.cancel'),
-          style: 'cancel',
-        },
-        {
-          text: t('common.confirm'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await StorageService.clearAllData();
-              Alert.alert(t('common.success'), t('settings.clearDataSuccess'));
-            } catch (error) {
-              console.error('Error clearing data:', error);
-              Alert.alert(t('common.error'), t('settings.clearDataError'));
-            }
-          },
-        },
-      ]
-    );
+    setClearConfirmVisible(true);
+  };
+
+  const confirmClearAll = async () => {
+    setClearConfirmVisible(false);
+    try {
+      await StorageService.clearAllData();
+      setClearFeedback({ title: t('common.success'), message: t('settings.clearDataSuccess') });
+    } catch (error) {
+      console.error('Error clearing data:', error);
+      setClearFeedback({ title: t('common.error'), message: t('settings.clearDataError') });
+    }
   };
 
   return (
@@ -212,65 +204,19 @@ export default function SettingsScreen() {
           <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
             <ModernCard elevation="md" padding="lg" style={styles.headerCard}>
               <View style={styles.headerContent}>
-                <Text style={styles.title}>
+                <AppText style={styles.title}>
                   {t('settings.title')}
-                </Text>
-                <Text style={styles.subtitle}>
+                </AppText>
+                <AppText style={styles.subtitle}>
                   {t('settings.subtitle')}
-                </Text>
+                </AppText>
               </View>
             </ModernCard>
           </Animated.View>
 
           {/* 设置选项 — grouped list */}
           <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
-            <SettingsGroup title={t('settings.language')}>
-              <View style={styles.languageOptions}>
-                <TouchableOpacity
-                  onPress={() => handleLanguageChange('en')}
-                  style={[
-                    styles.languageButton,
-                    currentLanguage === 'en' && styles.languageButtonSelected,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.languageButtonText,
-                      currentLanguage === 'en' && styles.languageButtonTextSelected,
-                    ]}
-                  >
-                    {t('settings.english')}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleLanguageChange('zh')}
-                  style={[
-                    styles.languageButton,
-                    currentLanguage === 'zh' && styles.languageButtonSelected,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.languageButtonText,
-                      currentLanguage === 'zh' && styles.languageButtonTextSelected,
-                    ]}
-                  >
-                    {t('settings.chinese')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </SettingsGroup>
-
-            <SettingsGroup title={t('settings.theme')}>
-              <View style={{ padding: theme.spacing.md }}>
-                <Text style={styles.themeText}>
-                  {isDarkMode ? t('settings.dark') : t('settings.light')} {t('settings.theme')}
-                </Text>
-                <Text style={styles.themeNote}>{t('settings.followsSystem', 'Follows system settings')}</Text>
-              </View>
-            </SettingsGroup>
-
-            <SettingsGroup title={t('settings.legalSection')}>
+            <SettingsGroup title={t('settings.trustDataSection')} footer={t('settings.trustDataFooter')}>
               <SettingsRowPressable
                 isFirst
                 label={t('settings.privacyPolicy')}
@@ -282,11 +228,97 @@ export default function SettingsScreen() {
                 showChevron
                 onPress={() => setDisclaimerOpen(true)}
               />
+              <View style={[styles.exportButtons, { padding: theme.spacing.md }]}>
+                <PrimaryButton
+                  title={t('settings.exportCSV', 'Export CSV')}
+                  onPress={async () => {
+                    try {
+                      await ExportService.exportCSVAndShare();
+                      Alert.alert(t('common.success'), t('settings.exportSuccess', 'Data exported successfully'));
+                    } catch (error) {
+                      console.error('Export error:', error);
+                      Alert.alert(t('common.error'), t('settings.exportError', 'Failed to export data'));
+                    }
+                  }}
+                  variant="outlined"
+                  size="medium"
+                  style={styles.exportButton}
+                />
+                <PrimaryButton
+                  title={t('settings.exportJSON', 'Export JSON')}
+                  onPress={async () => {
+                    try {
+                      await ExportService.exportJSONAndShare();
+                      Alert.alert(t('common.success'), t('settings.exportSuccess', 'Data exported successfully'));
+                    } catch (error) {
+                      console.error('Export error:', error);
+                      Alert.alert(t('common.error'), t('settings.exportError', 'Failed to export data'));
+                    }
+                  }}
+                  variant="outlined"
+                  size="medium"
+                  style={styles.exportButton}
+                />
+              </View>
+              <TouchableOpacity
+                onPress={handleClearData}
+                style={[styles.clearButton, { borderColor: designColors.error }]}
+              >
+                <AppText style={[styles.clearButtonText, { color: designColors.error }]}>
+                  {t('settings.clearData')}
+                </AppText>
+              </TouchableOpacity>
+            </SettingsGroup>
+
+            <SettingsGroup title={t('settings.loggingSection')}>
+              <View style={styles.languageOptions}>
+                <TouchableOpacity
+                  onPress={() => handleLanguageChange('en')}
+                  style={[
+                    styles.languageButton,
+                    currentLanguage === 'en' && styles.languageButtonSelected,
+                  ]}
+                >
+                  <AppText
+                    style={[
+                      styles.languageButtonText,
+                      currentLanguage === 'en' && styles.languageButtonTextSelected,
+                    ]}
+                  >
+                    {t('settings.english')}
+                  </AppText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleLanguageChange('zh')}
+                  style={[
+                    styles.languageButton,
+                    currentLanguage === 'zh' && styles.languageButtonSelected,
+                  ]}
+                >
+                  <AppText
+                    style={[
+                      styles.languageButtonText,
+                      currentLanguage === 'zh' && styles.languageButtonTextSelected,
+                    ]}
+                  >
+                    {t('settings.chinese')}
+                  </AppText>
+                </TouchableOpacity>
+              </View>
               <SettingsRowPressable
                 label={t('settings.showWelcomeAgain')}
                 showChevron
                 onPress={replayWelcome}
               />
+            </SettingsGroup>
+
+            <SettingsGroup title={t('settings.theme')}>
+              <View style={{ padding: theme.spacing.md }}>
+                <AppText style={styles.themeText}>
+                  {isDarkMode ? t('settings.dark') : t('settings.light')} {t('settings.theme')}
+                </AppText>
+                <AppText style={styles.themeNote}>{t('settings.followsSystem', 'Follows system settings')}</AppText>
+              </View>
             </SettingsGroup>
 
             <SettingsGroup title={t('settings.guidanceSection')}>
@@ -326,7 +358,7 @@ export default function SettingsScreen() {
             </SettingsGroup>
 
             {userSettings ? (
-              <SettingsGroup title={t('water.dailyIntake')} footer={t('water.nudgeHint')}>
+              <SettingsGroup title={t('settings.remindersSection')} footer={t('water.nudgeHint')}>
                 <SettingsRowToggle
                   isFirst
                   label={t('water.nudgeToggle')}
@@ -347,7 +379,7 @@ export default function SettingsScreen() {
                   }
                 />
                 <View style={[styles.sleepRow, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }]}>
-                  <Text style={styles.sleepLabel}>{t('water.quietHours')}</Text>
+                  <AppText style={styles.sleepLabel}>{t('water.quietHours')}</AppText>
                   <View style={styles.sleepInputs}>
                     <TextInput
                       mode="outlined"
@@ -358,7 +390,7 @@ export default function SettingsScreen() {
                         setUserSettings((s) => (s ? { ...s, sleepQuietHoursStart: text } : s))
                       }
                       onBlur={() => void patchUserSettings({ sleepQuietHoursStart: userSettings.sleepQuietHoursStart })}
-                      style={{ flex: 1, marginRight: 6, backgroundColor: theme.colors.surfaceVariant }}
+                      style={{ flex: 1, marginRight: theme.spacing.sm, backgroundColor: theme.colors.surfaceVariant }}
                     />
                     <TextInput
                       mode="outlined"
@@ -374,7 +406,7 @@ export default function SettingsScreen() {
                   </View>
                 </View>
                 <View style={{ padding: theme.spacing.md, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }}>
-                  <Text style={styles.themeNote}>{t('settings.dailyWaterGoal', 'Daily water goal (ml)')}</Text>
+                  <AppText style={styles.themeNote}>{t('settings.dailyWaterGoal', 'Daily water goal (ml)')}</AppText>
                   <TextInput
                     mode="outlined"
                     keyboardType="number-pad"
@@ -389,13 +421,13 @@ export default function SettingsScreen() {
                       const g = userSettings.dailyWaterGoal;
                       if (g >= 500 && g <= 8000) await patchUserSettings({ dailyWaterGoal: g });
                     }}
-                    style={{ marginTop: 8, backgroundColor: theme.colors.surfaceVariant }}
+                    style={{ marginTop: theme.spacing.xs, backgroundColor: theme.colors.surfaceVariant }}
                   />
                 </View>
               </SettingsGroup>
             ) : null}
 
-            <SettingsGroup title={t('settings.delightSection')}>
+            <SettingsGroup title={t('settings.feedbackSection')}>
               <SettingsRowToggle
                 isFirst
                 label={t('settings.delightSound')}
@@ -454,56 +486,24 @@ export default function SettingsScreen() {
 
             <CustomSuccessSoundsSection />
 
-            <SettingsGroup title={t('settings.dataManagement', 'Data Management')}>
-              <View style={[styles.exportButtons, { padding: theme.spacing.md }]}>
-                <PrimaryButton
-                  title={t('settings.exportCSV', 'Export CSV')}
-                  onPress={async () => {
-                    try {
-                      await ExportService.exportCSVAndShare();
-                      Alert.alert(t('common.success'), t('settings.exportSuccess', 'Data exported successfully'));
-                    } catch (error) {
-                      console.error('Export error:', error);
-                      Alert.alert(t('common.error'), t('settings.exportError', 'Failed to export data'));
-                    }
-                  }}
-                  variant="outlined"
-                  size="medium"
-                  style={styles.exportButton}
+            {__DEV__ ? (
+              <SettingsGroup title="Development">
+                <SettingsRowPressable
+                  isFirst
+                  label="UI Playground"
+                  showChevron
+                  onPress={() => router.push('/playground')}
                 />
-                <PrimaryButton
-                  title={t('settings.exportJSON', 'Export JSON')}
-                  onPress={async () => {
-                    try {
-                      await ExportService.exportJSONAndShare();
-                      Alert.alert(t('common.success'), t('settings.exportSuccess', 'Data exported successfully'));
-                    } catch (error) {
-                      console.error('Export error:', error);
-                      Alert.alert(t('common.error'), t('settings.exportError', 'Failed to export data'));
-                    }
-                  }}
-                  variant="outlined"
-                  size="medium"
-                  style={styles.exportButton}
-                />
-              </View>
-              <TouchableOpacity
-                onPress={handleClearData}
-                style={[styles.clearButton, { borderColor: designColors.error }]}
-              >
-                <Text style={[styles.clearButtonText, { color: designColors.error }]}>
-                  {t('settings.clearData')}
-                </Text>
-              </TouchableOpacity>
-            </SettingsGroup>
+              </SettingsGroup>
+            ) : null}
 
             <SettingsGroup title={t('settings.about')}>
               <View style={styles.aboutInfo}>
-                <Text style={styles.aboutText}>Flow</Text>
-                <Text style={styles.versionText}>{t('settings.version')}: 1.0.0</Text>
-                <Text style={styles.descriptionText}>
+                <AppText style={styles.aboutText}>Flow</AppText>
+                <AppText style={styles.versionText}>{t('settings.version')}: 1.0.0</AppText>
+                <AppText style={styles.descriptionText}>
                   {t('settings.description', 'Track your body flow with ease and care')}
-                </Text>
+                </AppText>
               </View>
             </SettingsGroup>
           </Animated.View>
@@ -524,6 +524,23 @@ export default function SettingsScreen() {
       <Share7DayModal
         visible={shareModalOpen}
         onClose={() => setShareModalOpen(false)}
+      />
+      <AppConfirmDialog
+        visible={clearConfirmVisible}
+        title={t('settings.clearData')}
+        message={t('settings.clearDataConfirm')}
+        confirmLabel={t('common.confirm')}
+        cancelLabel={t('common.cancel')}
+        destructive
+        onConfirm={() => void confirmClearAll()}
+        onCancel={() => setClearConfirmVisible(false)}
+      />
+      <AppAlertDialog
+        visible={!!clearFeedback}
+        title={clearFeedback?.title ?? ''}
+        message={clearFeedback?.message ?? ''}
+        buttonLabel={t('common.ok', 'OK')}
+        onDismiss={() => setClearFeedback(null)}
       />
     </SwipeableContainer>
   );
@@ -629,6 +646,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
     borderRadius: theme.radius.md,
     borderWidth: 1.5,
+    backgroundColor: `${theme.colors.error}10`,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: theme.touchTarget.min,
